@@ -4,45 +4,81 @@
 class User
 class Post
 class Profile
-class Feed
+class Media
+class Tag
+class Like
+class Comment
+class Follower
+
 
 class User {
+    +username:str
     -email:str
     -password:str
-    +full_name:str
-    +bio:str
-    +avatar:image
-    register()
-    confirm_registration()
+    register_user()
+    confirm_registration_email()
     add_profile_info()
     create_post()
     like_post()
+    comment_post()
+    follow_profile()
 }
 
 class Post {
     +author:User
-    +images:List[image]
-    +tags:List[str]
-    +likes:List[User]
-    add_image()
-    add_tag()
+    +description:str
+    #add_image()
+    #add_tag()
+    #edit_description()
+    +add_like()
+    +add_comment()
 }
 
 class Profile {
-    +full_name:User.full_name
-    +bio:User.bio
-    +posts:List[User.post]
+    +full_name:str
+    +bio:str
+    +avatar:image
+    #edit_profile()
 }
 
-class Feed {
-    +posts:List[Post]
+class Tag {
+    +title:str
 }
+
+class Like {
+    +liker:User
+    +target:Post
+}
+
+class Media {
+    image:path
+}
+
+class Comment {
+    +author:User
+    +text:str
+    +target:Post
+}
+
+class Follower {
+    +follower: User
+    +target: Profile
+}
+
 
 User "1" *- "many" Post : creating >
 User "1" *- "1" Profile
-Feed "1" --> "many" Post : contains >
+User "1"-->"many" Like
+User "1"-->"many" Comment
 Profile "1" --> "many" Post : contains >
 Post --|> User
+Post "1"-->"many" Media
+Post "1"-->"many" Tag
+Post "1"-->"many" Comment
+Post "1"-->"many" Like
+Tag "1" o-- "many" Post
+Follower "many"<-->"many" Profile
+Follower <-- User
 
 
 
