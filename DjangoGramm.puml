@@ -1,0 +1,49 @@
+@startuml
+
+
+class User
+class Post
+class Profile
+class Feed
+
+class User {
+    -email:str
+    -password:str
+    +full_name:str
+    +bio:str
+    +avatar:image
+    register()
+    confirm_registration()
+    add_profile_info()
+    create_post()
+    like_post()
+}
+
+class Post {
+    +author:User
+    +images:List[image]
+    +tags:List[str]
+    +likes:List[User]
+    add_image()
+    add_tag()
+}
+
+class Profile {
+    +full_name:User.full_name
+    +bio:User.bio
+    +posts:List[User.post]
+}
+
+class Feed {
+    +posts:List[Post]
+}
+
+User "1" *- "many" Post : creating >
+User "1" *- "1" Profile
+Feed "1" --> "many" Post : contains >
+Profile "1" --> "many" Post : contains >
+Post --|> User
+
+
+
+@enduml
