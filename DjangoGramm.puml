@@ -3,7 +3,6 @@
 
 class User
 class Post
-class Profile
 class Media
 class Tag
 class Like
@@ -15,6 +14,9 @@ class User {
     +username:str
     -email:str
     -password:str
+    +full_name:str
+    +bio:str
+    +avatar:image
     register_user()
     confirm_registration_email()
     add_profile_info()
@@ -34,12 +36,6 @@ class Post {
     +add_comment()
 }
 
-class Profile {
-    +full_name:str
-    +bio:str
-    +avatar:image
-    #edit_profile()
-}
 
 class Tag {
     +title:str
@@ -62,23 +58,20 @@ class Comment {
 
 class Follower {
     +follower: User
-    +target: Profile
+    +target: User
 }
 
 
 User "1" *- "many" Post : creating >
-User "1" *- "1" Profile
 User "1"-->"many" Like
 User "1"-->"many" Comment
-Profile "1" --> "many" Post : contains >
 Post --|> User
 Post "1"-->"many" Media
 Post "1"-->"many" Tag
 Post "1"-->"many" Comment
 Post "1"-->"many" Like
 Tag "1" o-- "many" Post
-Follower "many"<-->"many" Profile
-Follower <-- User
+Follower "many"<-->"many" User
 
 
 
