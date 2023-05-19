@@ -3,10 +3,10 @@
 {% block content %}
 
 <div class="d-flex flex-column align-items-center">
-    {% if fltr and posts %}
-    <h2>Publications tagged {{ fltr }}</h2>
-    {% elif fltr and not posts %}
-    <h2>There is no publications tagged {{ fltr }}</h2>
+    {% if tag_slug and posts %}
+    <h2>Publications tagged {{ tag_slug }}</h2>
+    {% elif tag_slug and not posts %}
+    <h2>There is no publications tagged {{ tag_slug }}</h2>
     {% else %}
     <h2>Recent publications</h2>
     {% endif %}
@@ -95,7 +95,7 @@
             {% for tag in post.tags.all %}
             <div class="btn btn-secondary" role="alert"
                  style="display: inline-block;">
-                <a href="{% url 'filtered_home' %}?tag={{ tag|urlencode }}" class="alert-link">{{ tag }}
+                <a href="{% url 'feed' %}?tag={{ tag|urlencode }}" class="alert-link">{{ tag }}
                     </a>
                 {% if request.user.id == post.author.id %}
                 <form method="POST" action="{% url 'remove_tag' post_id=post.id tag_title=tag.title %}">

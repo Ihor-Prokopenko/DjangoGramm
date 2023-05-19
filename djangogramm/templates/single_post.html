@@ -6,9 +6,13 @@
     <div class="card justify-content-center mx-auto mt-3" style="max-width: 700px; min-width: 50%;">
             <div class="card-headercard-header d-flex justify-content-between align-items-center">
 
-                <a class="nav-link" href="{% url 'profile' post.author.id %}"><img src="{{ post.author.avatar.url }}"
+                <a class="nav-link" href="{% url 'profile' post.author.id %}">
+                    {% if post.author.avatar %}
+                    <img src="{{ post.author.avatar.url }}"
                                                                                    width="50"
-                                                                                   class="rounded-circle"> <strong>
+                                                                                   class="rounded-circle">
+                    {% endif %}
+                    <strong>
                     {{ post.author }}</strong></a>
                 {% if user.id == post.author.id %}
                 <a href="{% url 'delete_post' post_id=post.id %}" class="btn-close btn-outline-danger btn-sm me-2"></a>
@@ -81,18 +85,23 @@
                                 data-bs-target="#{{ comment.id }}" aria-expanded="false"
                                 aria-controls="flush-collapseOne">
                             <div class="d-flex">
-                                <a class="nav-link" href="{% url 'profile' comment.author.id %}"><img
-                                        src="{{ comment.author.avatar.url }}"
-                                        width="20"
-                                        class="rounded-circle"> {{ comment.author.username }}</a>
+                                <a class="nav-link" href="{% url 'profile' comment.author.id %}">
+                                    {% if comment.author.avatar %}
+                                    <img src="{{ comment.author.avatar.url }}"
+                                            width="20"
+                                            class="rounded-circle">
+                                    {% endif %}
+                                    {{ comment.author.username }} :</a>
                             </div>
+                            {% if comment.get_total_comments_count > 0 %}
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                 {{ comment.get_total_comments_count }}
                                 <span class="visually-hidden">unread messages</span>
-                              </span>
+                            </span>
+                            {% endif %}
                         </button>
                         <div class="container mx-2">
-                            <h5 class="">{{ comment.text }}</h5>
+                            <h5 class="ms-4">{{ comment.text }}</h5>
                         </div>
                     </h2>
                     <hr>
@@ -101,11 +110,16 @@
                         <div class="accordion-body mx-4">
                             <div class="text-center">
                                 <div class="dropdown">
-                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle"
+
+                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
                                             data-bs-toggle="dropdown"
                                             aria-expanded="false" data-bs-auto-close="outside">
                                         Answer
                                     </button>
+                                    {% if comment.author.id == request.user.id %}
+        <a href="{% url 'delete_comment' comment_id=comment.id %}" class="btn btn-outline-danger btn-sm me-2">Delete</a>
+                                    {% endif %}
+
                                     <form method="post" class="dropdown-menu p-4"
                                           action="{% url 'comment_comment' comment_id=comment.id %}">
                                         <div class="mb-3">
@@ -119,14 +133,20 @@
                             <hr>
 
                             {% for comment in comment.comments.all %}
-                            <div class="d-flex">
-                                <a class="nav-link" href="{% url 'profile' comment.author.id %}"><img
-                                        src="{{ comment.author.avatar.url }}"
-                                        width="20"
-                                        class="rounded-circle"> {{ comment.author.username }}</a>
+                            <div class="d-flex justify-content-between">
+                                <a class="nav-link" href="{% url 'profile' comment.author.id %}">
+                                    {% if comment.author.avatar %}
+                                    <img src="{{ comment.author.avatar.url }}"
+                                            width="20"
+                                            class="rounded-circle">
+                                    {% endif %}
+                                    {{ comment.author.username }} :</a>
+                                    {% if comment.author.id == request.user.id %}
+        <a href="{% url 'delete_comment' comment_id=comment.id %}" class="btn btn-outline-danger btn-sm me-2">Delete</a>
+                                    {% endif %}
                             </div>
                             <br>
-                            <h5>{{ comment.text }}</h5>
+                            <h5 class="ms-4">  {{ comment.text }}</h5>
                             <p class="text-end">{{ comment.date_created }}</p>
                             <hr>
                             {% endfor %}
@@ -145,7 +165,7 @@
                 {% for tag in post.tags.all %}
                 <div class="alert alert-info alert-dismissible fade show alert-sm d-inline-block" role="alert"
                      style="display: inline-block;">
-                    <a href="#" class="alert-link">{{ tag }}</a>
+                    <a href="{% url 'feed' %}?tag={{ tag|urlencode }}" class="alert-link">{{ tag }}</a>
                     {% if request.user.id == post.author.id %}
                     <form method="POST" action="{% url 'remove_tag' post_id=post.id tag_title=tag.title %}">
                         {% csrf_token %}

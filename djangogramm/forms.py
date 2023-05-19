@@ -1,7 +1,8 @@
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
-from .models import CustomUser, Post, Media, Tag
+from .models import User, Post, Media, Tag
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxLengthValidator
 import re
 
 
@@ -10,7 +11,7 @@ class SignUpForm(UserCreationForm):
                              widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'email'}))
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ('username', 'email', 'password1', 'password2', 'avatar')
 
     def __init__(self, *args, **kwargs):
@@ -35,14 +36,6 @@ class SignUpForm(UserCreationForm):
         self.fields['password2'].label = ''
         self.fields[
             'password2'].help_text = '<span class="form-text text-muted"><small>Enter the same password as before, for verification.</small></span>'
-
-
-class TagSelectWidget(forms.SelectMultiple):
-    def __init__(self, attrs=None):
-        default_attrs = {'class': 'form-control'}
-        if attrs:
-            default_attrs.update(attrs)
-        super().__init__(attrs=default_attrs)
 
 
 class PostForm(forms.ModelForm):
@@ -98,7 +91,7 @@ class TagForm(forms.Form):
 
 
 class CommentForm(forms.Form):
-    text = forms.CharField(max_length=255)
+    text = forms.CharField(max_length=255, validators=[MaxLengthValidator(255)])
 
     def __init__(self, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
@@ -106,6 +99,17 @@ class CommentForm(forms.Form):
         self.fields['text'].widget = forms.Textarea(attrs={
             'class': 'form-control',
             'aria-label': 'With textarea',
-            'maxlength': '255',
+            'max-length': '255',
             'style': 'height: 100px;'
         })
+
+
+class LoginUserForm(AuthenticationForm):
+    username = forms.CharField(label='Login')
+    password = forms.PasswordInput()
+
+    def __init__(self, *args, **kwargs):
+        super(LoginUserForm, self).__init__(*args, **kwargs)
+
+        self.fields['username'].widget.attrs['class'] = 'form-control'
+        self.fields['password'].widget.attrs['class'] = 'form-control'
