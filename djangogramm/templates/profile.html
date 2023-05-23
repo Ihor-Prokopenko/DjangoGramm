@@ -3,27 +3,79 @@
 {% block content %}
 
 
-<div class="">
-    <div class="d-flex mx-auto mt-3" style="max-width: 700px; min-width: 50%;">
-        <div class="justify-content-start">
+<div class="container text-light">
+    <div class="d-flex mx-auto mt-3" style="max-width: 700px;">
+        <div class="">
             <div class="">
-                <div class="me-3 text-center">
+                <div class="me-3 text-center mt-3">
                     <img src="{{ profile.avatar.url }}" width="150" class="rounded-circle">
                 </div>
 
             </div>
         </div>
-        <div class="p-2 flex-fill">
+        <div class="container overflow-hidden">
             <div class="">
-                <h4 class="card-title">{{ profile.username }}</h4>
-                <hr>
+                <div class="d-flex justify-content-between">
+                    <a class="container nav-link">
+                        <h4 class="">{{ profile.username }}</h4>
+                    </a>
+                    <a class="d-flex">
+                        {% if request.user.id != profile.id %}
+                        {% if request.user in profile.followers.all %}
+                        <div><a href="{% url 'follow' user_id=profile.id %}" class="btn btn-outline-danger btn-sm me-2">Unfollow</a>
+                        </div>
+                        {% else %}
+                        <div><a href="{% url 'follow' user_id=profile.id %}"
+                                class="btn btn-outline-secondary btn-sm me-2">Follow</a></div>
+                        {% endif %}
+                        {% endif %}
+                    </a>
+                </div>
+                <hr class="hr">
                 <div class="d-flex mt-2">
-                    <h6>
-                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas"
-                                data-bs-target="#offcanvasScrollingFollows" aria-controls="offcanvasScrollingFollows">
+                    <h6 class="me-3">Publications {{ profile.posts.count }}
+                    </h6>
+                    <h6 class="me-3">
+                        <a class="nav-link" type="button" data-bs-toggle="offcanvas"
+                           data-bs-target="#offcanvasScrollingFollowers"
+                           aria-controls="offcanvasScrollingFollowers">Followers
+                            {{profile.followers.count }}
+                        </a>
+
+                        <div class="offcanvas offcanvas-start text-bg-dark" data-bs-scroll="true"
+                             data-bs-backdrop="false"
+                             tabindex="-1" id="offcanvasScrollingFollowers"
+                             aria-labelledby="offcanvasScrollingFollowersLabel">
+                            <div class="offcanvas-header">
+                                <h5 class="offcanvas-title mx-auto mt-2" id="offcanvasScrollingLabel">{{ profile }}
+                                    followers: </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                                        aria-label="Close"></button>
+                            </div>
+                            <hr class="hr">
+                            <div class="offcanvas-body">
+                                {% for follower in profile.followers.all %}
+                                <a class="nav-link" href="{% url 'profile' follower.id %}">
+                                    <div class="d-flex justify-content-center">
+                                        {% if follower.avatar %}
+                                        <img src="{{ follower.avatar.url }}" width="35" height="35"
+                                             class="rounded-circle me-2">
+                                        {% endif %}
+                                        <h3>{{ follower.username }}</h3>
+                                    </div>
+                                    <hr class="hr">
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </h6>
+                    <h6 class="me-2">
+                        <a class="nav-link" type="button" data-bs-toggle="offcanvas"
+                           data-bs-target="#offcanvasScrollingFollows" aria-controls="offcanvasScrollingFollows">
                             Follows
                             {{profile.follows.count }}
-                        </button>
+                        </a>
 
                         <div class="offcanvas offcanvas-start text-bg-dark" data-bs-scroll="true"
                              data-bs-backdrop="false"
@@ -34,117 +86,59 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
                                         aria-label="Close"></button>
                             </div>
-                            <hr>
+                            <hr class="hr">
                             <div class="offcanvas-body">
                                 {% for follow in profile.follows.all %}
-                                    <a class="nav-link" href="{% url 'profile' follow.id %}">
-                                <div class="d-flex justify-content-center">
+                                <a class="nav-link" href="{% url 'profile' follow.id %}">
+                                    <div class="d-flex justify-content-center">
                                         {% if follow.avatar %}
-                                        <img src="{{ follow.avatar.url }}" width="35" height="35" class="rounded-circle me-2">
+                                        <img src="{{ follow.avatar.url }}" width="35" height="35"
+                                             class="rounded-circle me-2">
                                         {% endif %}
-                                          <h3>{{ follow.username }}</h3>
-                                </div>
-                                <hr>
-                                    </a>
+                                        <h3>{{ follow.username }}</h3>
+                                    </div>
+                                    <hr>
+                                </a>
                                 {% endfor %}
                             </div>
                         </div>
 
                     </h6>
-                    <h6 class="ms-2">
-                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas"
-                                data-bs-target="#offcanvasScrollingFollowers"
-                                aria-controls="offcanvasScrollingFollowers">Followers
-                            {{profile.followers.count }}
-                        </button>
 
-                        <div class="offcanvas offcanvas-start text-bg-dark" data-bs-scroll="true"
-                             data-bs-backdrop="false"
-                             tabindex="-1" id="offcanvasScrollingFollowers"
-                             aria-labelledby="offcanvasScrollingFollowersLabel">
-                            <div class="offcanvas-header">
-                                <h5 class="offcanvas-title mx-auto mt-2" id="offcanvasScrollingLabel">{{ profile }} followers: </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
-                                        aria-label="Close"></button>
-                            </div>
-                            <hr>
-                            <div class="offcanvas-body">
-                                {% for follower in profile.followers.all %}
-                                    <a class="nav-link" href="{% url 'profile' follower.id %}">
-                                <div class="d-flex justify-content-center">
-                                        {% if follower.avatar %}
-                                        <img src="{{ follower.avatar.url }}" width="35" height="35" class="rounded-circle me-2">
-                                        {% endif %}
-                                          <h3>{{ follower.username }}</h3>
-                                </div>
-                                <hr>
-                                    </a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% if request.user.id != profile.id %}
-                        {% if request.user in profile.followers.all %}
-                        <a href="{% url 'follow' user_id=profile.id %}"><img src="{% static 'img/favorite_on.png' %}"
-                                                                             style="width: 30px;"> </a>
-                        {% else %}
-                        <a href="{% url 'follow' user_id=profile.id %}"><img src="{% static 'img/favorite_off.png' %}"
-                                                                             style="width: 30px;"></a>
-                        {% endif %}
-                        {% endif %}
-                    </h6>
 
                 </div>
-                <h6>Publications: <span class="badge bg-secondary">{{ profile.posts.count }}</span>
-                </h6>
+            </div>
+            <br>
+            <div class="bio">
+                Bio:
+                dasdadasdas dasdadsadad asddsaadadadadasdas
+                dasdadsadaddddddddddddddddddddddddddddddddd ddddasssssssssssssss sssssssssssssssss ssssssssssssss
+                sssssssss sssssssss
+                adsssssssssssssssssssssssssssssssssssssssssssssssssss
             </div>
         </div>
-        <hr>
-    </div>
-    <div class="mx-auto" style="max-width: 700px; min-width: 50%;">
-        <hr>
-        <h6>Bio: {{ profile.bio }}</h6>
+        <hr class="hr">
     </div>
 </div>
 
-<div class="container" style="max-width: 700px; min-width: 50%;">
-    <hr>
-    <div class="row row-cols-1 row-cols-md-3 g-2">
-        {% for post in profile.posts.all %}
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body d-flex align-items-center justify-content-center">
-                    {% if post.images.first %}
-                    <img src="{{ post.images.first.image.url }}" class="rounded"
-                         style="max-width: 100%; max-height: 180px;">
-                    {% endif %}
-                </div>
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            {% if user in post.likes.all %}
-                            <a href="{% url 'like' post_id=post.id %}"><img src="{% static 'img/favorite_on.png' %}"
-                                                                            width="25"
-                                                                            class="">
-                            </a>
-                            {% else %}
-                            <a href="{% url 'like' post_id=post.id %}"><img src="{% static 'img/favorite_off.png' %}"
-                                                                            width="25"
-                                                                            class=""></a>
-                            {% endif %}
-                            <span class="badge bg-secondary">{{ post.likes.count }}</span>
+<div class="container text-center" style="max-width: 700px; min-width: 50%;">
+<div class="btn-group">
+    <a href="{% url 'profile' profile.id %}?active_tab=publications"
+       class="btn btn-outline-secondary {% if active_tab != 'favourites' and active_tab != 'comments' %}active{% endif %}"
+       aria-current="page">publications</a>
+    <a href="{% url 'profile' profile.id %}?active_tab=favourites"
+       class="btn btn-outline-secondary {% if active_tab == 'favourites' %}active{% endif %}">favourites</a>
+    <a href="{% url 'profile' profile.id %}?active_tab=comments"
+       class="btn btn-outline-secondary {% if active_tab == 'comments' %}active{% endif %}">comments</a>
+</div>
+    <hr class="hr">
+    {% if active_tab != 'favourites' and active_tab != 'comments' %}
+    {% include 'posts.html' %}
+    {% elif active_tab == 'favourites' %}
+    {% include 'favourites.html' %}
+    {% elif active_tab == 'comments' %}
+    {% include 'profile_comments.html' %}
+    {% endif %}
 
-                        </div>
-                        <div>
-
-                            <a href="{% url 'single_post' post_id=post.id %}"><span class="badge bg-secondary">{{ post.get_total_comments_count }}</span></a>
-                            <a href="{% url 'single_post' post_id=post.id %}"><img src="{% static 'img/comment.png' %}"
-                                                                                   width="25"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
 </div>
 {% endblock %}

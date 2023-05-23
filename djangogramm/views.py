@@ -17,7 +17,8 @@ def search_recognizer(request):
         user = User.objects.filter(username=slug_clear).first()
         if user:
             return redirect('profile', pk=user.id)
-        return redirect('feed')
+        request.session['profile_slug'] = slug_clear
+        return redirect('profile_search')
 
     request.session['search_slug'] = search_slug
     return redirect('feed')
@@ -32,12 +33,17 @@ class FeedPage(ListView):
         search_slug = self.request.session.get('search_slug')
         if search_slug:
             return Post.objects.filter(tags__slug__icontains=search_slug).order_by('-date_created')
+        search_slug = self.request.GET.get('tag')
+        if search_slug:
+            return Post.objects.filter(tags__slug__icontains=search_slug).order_by('-date_created')
 
         return Post.objects.all().order_by('-date_created')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         search_slug = self.request.session.get('search_slug')
+        if not search_slug:
+            search_slug = self.request.GET.get('tag')
         context['tag_slug'] = search_slug
         context['comment_form'] = CommentForm()
         self.request.session['search_slug'] = None   # cleaning session to work feed page correct after searching
@@ -52,6 +58,7 @@ class ShowPost(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        active_tab = self.request.GET.get('active_tab')
         context['comment_form'] = CommentForm()
         return context
 
@@ -73,7 +80,7 @@ class CreatePost(CreateView):
             for image in images:
                 if image:
                     Media.objects.create(image=image, post=post)
-
+        post.generate_preview()
         tag_form = TagForm(self.request.POST)
         if tag_form.is_valid():
             tags = tag_form.cleaned_data.get('tags')
@@ -101,7 +108,29 @@ class ShowProfile(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        active_tab = self.request.GET.get('active_tab')
         context['profile'] = self.object
+        context['active_tab'] = active_tab
+        return context
+
+
+class SearchProfile(ListView):
+    model = User
+    template_name = 'profile_search.html'
+    context_object_name = 'profiles'
+
+    def get_queryset(self):
+        profile_slug = self.request.session.get('profile_slug')
+        if profile_slug:
+            user_list = User.objects.filter(username__icontains=profile_slug).all()
+            return user_list
+        return User.objects.all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile_slug = self.request.session.get('profile_slug')
+        context['profile_slug'] = profile_slug
+        self.request.session['profile_slug'] = None   # cleaning session to work feed page correct after searching
         return context
 
 

@@ -1,0 +1,35 @@
+{% load static %}
+{% if post.images.all %}
+<div id="{{ post.id }}" class="carousel carousel-dark slide">
+  <div class="carousel-indicators">
+      {% if post.images.count > 1 %}
+    {% for media in post.images.all %}
+      {% if forloop.first %}
+        <button type="button" data-bs-target="#{{ post.id }}" data-bs-slide-to="{{ forloop.counter0 }}" class="active" aria-current="true" aria-label="Slide {{ forloop.counter }}"></button>
+      {% else %}
+        <button type="button" data-bs-target="#{{ post.id }}" data-bs-slide-to="{{ forloop.counter0 }}" class="indicator-btn" aria-label="Slide {{ forloop.counter }}"></button>
+      {% endif %}
+    {% endfor %}
+      {% endif %}
+  </div>
+  <div class="carousel-inner">
+    {% for media in post.images.all %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}" data-bs-interval="10000">
+        <a class="d-flex align-items-center justify-content-center" style="min-height: 600px;">
+          <img src="{{ media.image.url }}" style="max-width: 100%; max-height: 800px;">
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+  {% if post.images.count > 1 %}
+  <button class="carousel-control-prev indicator-btn" type="button" data-bs-target="#{{ post.id }}" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next indicator-btn" type="button" data-bs-target="#{{ post.id }}" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+  {% endif %}
+</div>
+{% endif %}

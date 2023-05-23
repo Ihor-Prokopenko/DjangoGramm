@@ -1,0 +1,85 @@
+<div class="accordion accordion-flush text-light" id="accordionFlushExample">
+    <div class="accordion-item">
+        {% if post.comments.all %}
+        {% for comment in post.comments.all %}
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#{{ comment.id }}" aria-expanded="false"
+                    aria-controls="flush-collapseOne">
+                <div class="d-flex">
+                    <a class="nav-link text-light" href="{% url 'profile' comment.author.id %}">
+                        {% if comment.author.avatar %}
+                        <img src="{{ comment.author.avatar.url }}"
+                             width="20"
+                             class="rounded-circle">
+                        {% endif %}
+                        {{ comment.author.username }} :</a>
+                </div>
+                {% if comment.get_total_comments_count > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ comment.get_total_comments_count }}
+                                <span class="visually-hidden">unread messages</span>
+                            </span>
+                {% endif %}
+            </button>
+            <div class="container mx-2">
+                <h5 class="ms-4 text-light">{{ comment.text }}</h5>
+            </div>
+        </h2>
+        <hr>
+        <div id="{{ comment.id }}" class="accordion-collapse collapse"
+             data-bs-parent="#accordionFlushExample">
+            <div class="accordion-body mx-4">
+                <div class="text-center">
+                    <div class="dropdown">
+
+                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false" data-bs-auto-close="outside">
+                            Answer
+                        </button>
+                        {% if comment.author.id == request.user.id %}
+                        <a href="{% url 'delete_comment' comment_id=comment.id %}"
+                           class="btn btn-outline-danger btn-sm me-2">Delete</a>
+                        {% endif %}
+
+                        <form method="post" class="dropdown-menu p-4"
+                              action="{% url 'comment_comment' comment_id=comment.id %}">
+                            <div class="mb-3">
+                                {% csrf_token %}
+                                {{ comment_form.as_p }}
+                            </div>
+                            <button type="submit" class="btn btn-outline-secondary">OK</button>
+                        </form>
+                    </div>
+                </div>
+                <hr>
+
+                {% for comment in comment.comments.all %}
+                <div class="d-flex justify-content-between">
+                    <a class="nav-link text-light" href="{% url 'profile' comment.author.id %}">
+                        {% if comment.author.avatar %}
+                        <img src="{{ comment.author.avatar.url }}"
+                             width="20"
+                             class="rounded-circle">
+                        {% endif %}
+                        {{ comment.author.username }} :</a>
+                    {% if comment.author.id == request.user.id %}
+                    <a href="{% url 'delete_comment' comment_id=comment.id %}"
+                       class="btn btn-outline-danger btn-sm me-2">Delete</a>
+                    {% endif %}
+                </div>
+                <br>
+                <h5 class="ms-4 text-light"> {{ comment.text }}</h5>
+                <p class="text-end">{{ comment.date_created }}</p>
+                <hr>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="ms-4 text-secondary">There are no comments yet...</p>
+        {% endif %}
+    </div>
+</div>

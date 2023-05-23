@@ -13,6 +13,7 @@ urlpatterns = [
     path('like/<int:post_id>/', views.like_action, name='like'),
     path('follow/<int:user_id>/', views.follow_action, name='follow'),
     path('profile/<int:pk>/', views.ShowProfile.as_view(), name='profile'),
+    path('profile/search/', views.SearchProfile.as_view(), name='profile_search'),
     path('remove_tag/<int:post_id>/<str:tag_title>/', views.remove_tag, name='remove_tag'),
     path('comment_post/<int:post_id>/', views.CommentView.as_view(), name='comment_post'),
     path('comment_comment/<int:comment_id>/', views.CommentView.as_view(), name='comment_comment'),
