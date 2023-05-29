@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
  <br>
-<div class="d-flex flex-column align-items-center">
+<div class="d-flex flex-column align-items-center text-light">
 {% if profiles %}
 
 {% if profile_slug %}
@@ -17,7 +17,7 @@ All profiles
 <br>
 
 <a class="nav-link" href="{% url 'profile' profile.id %}">
-    <div class="card">
+    <div class="card text-light">
         <div class="card-body d-flex align-items-center">
             <img src="{{ profile.avatar.url }}" width="50" class="rounded-circle me-1">
             <h4 class="me-3">@{{ profile.username }}</h4>
@@ -38,5 +38,5 @@ No matches were found for @{{ profile_slug }}
 {% endif %}
 
 </div>
-
+<br>
 {% endblock %}

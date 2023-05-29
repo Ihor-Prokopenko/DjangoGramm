@@ -1,0 +1,29 @@
+{% if page_obj.has_other_pages %}
+<div class="btn-group" role="group" aria-label="Default button group">
+    {% if page_obj.has_previous %}
+  {% if request.GET.tag %}
+  <a class="btn btn-outline-secondary" href="?tag={{ request.GET.tag|urlencode }}&page={{ page_obj.previous_page_number }}"><</a>
+  {% elif request.GET.username %}
+  <a class="btn btn-outline-secondary" href="?username={{ request.GET.username|urlencode }}&page={{ page_obj.previous_page_number }}"><</a>
+  {% elif request.GET.active_tab %}
+  <a class="btn btn-outline-secondary" href="?active_tab={{ request.GET.active_tab|urlencode }}&page={{ page_obj.previous_page_number }}"><</a>
+  {% else %}
+  <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}"><</a>
+  {% endif %}
+  {% endif %}
+
+  <a class="btn btn-outline-secondary disabled"><strong>{{ page_obj.number }}</strong> / {{ page_obj.paginator.num_pages }}</a>
+
+  {% if page_obj.has_next %}
+  {% if request.GET.tag %}
+  <a class="btn btn-outline-secondary" href="?tag={{ request.GET.tag|urlencode }}&page={{ page_obj.next_page_number }}">></a>
+  {% elif request.GET.username %}
+  <a class="btn btn-outline-secondary" href="?username={{ request.GET.username|urlencode }}&page={{ page_obj.next_page_number }}">></a>
+   {% elif request.GET.active_tab %}
+  <a class="btn btn-outline-secondary" href="?active_tab={{ request.GET.active_tab|urlencode }}&page={{ page_obj.next_page_number }}">></a>
+  {% else %}
+  <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}">></a>
+  {% endif %}
+  {% endif%}
+</div>
+{% endif %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="col-md-6 offset-md-3 text-light">
+<form method="post" enctype="multipart/form-data">
+        <div class="text-light">
+            {% csrf_token %}
+            {{ form }}
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-secondary">Ok</button>
+            <button type="button" class="btn btn-danger">Cancel</button>
+        </div>
+</form>
+</div>
+{% endblock %}

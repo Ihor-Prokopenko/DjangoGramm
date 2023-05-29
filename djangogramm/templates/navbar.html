@@ -14,7 +14,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'profile' pk=request.user.id %}">
                         {% if request.user.avatar %}
-                        <img src="{{ user.avatar.url }}" width="25" class="rounded-circle">
+                        <img src="{{ request.user.avatar.url }}" width="25" class="rounded-circle">
                         {% endif %}
                         {{ request.user.username }} </a>
 
@@ -29,8 +29,8 @@
                         <div class="input-group mt-2">
                             <input type="text" class="form-control" name="q" placeholder="Search"
                                    list="tagList" style="height: 28px; width: 125px;">
-                            <div>
-                                <datalist id="tagList" style="height: 10px;">
+                            <div style="height: 10px;">
+                                <datalist id="tagList">
                                     {% for item in search_items %}
                                     <option value="{{ item }}">{{ item }}</option>
                                     {% endfor %}

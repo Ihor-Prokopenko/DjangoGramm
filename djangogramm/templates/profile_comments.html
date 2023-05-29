@@ -1,14 +1,13 @@
 {% load static %}
 <div class="d-flex flex-column align-items-center text-light">
-        {% for comment in profile.comments.all %}
-        <div class="col-6 col-sm-4">
-    <hr class="hr">
-
-            <a href="" class="nav-link">
-                {{ comment.text }}
-
-            </a>
-
-        </div>
-        {% endfor %}
+{% if profile.comments.all %}
+<div class="container" style="max-width: 700px;">
+    {% for comment in profile.comments.all %}
+    
+    {% include 'comment.html' %}
+    {% endfor %}
+</div>
+{% else %}
+<p class="ms-4 text-secondary">There are no comments yet...</p>
+{% endif %}
     </div>

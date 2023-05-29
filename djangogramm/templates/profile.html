@@ -28,6 +28,8 @@
                         <div><a href="{% url 'follow' user_id=profile.id %}"
                                 class="btn btn-outline-secondary btn-sm me-2">Follow</a></div>
                         {% endif %}
+                        {% else %}
+                        <a class="nav-link" href="{% url 'edit_profile' %}"><img src="{% static 'img/edit.png' %}" width="20"></a>
                         {% endif %}
                     </a>
                 </div>
@@ -110,35 +112,44 @@
             </div>
             <br>
             <div class="bio">
-                Bio:
-                dasdadasdas dasdadsadad asddsaadadadadasdas
-                dasdadsadaddddddddddddddddddddddddddddddddd ddddasssssssssssssss sssssssssssssssss ssssssssssssss
-                sssssssss sssssssss
-                adsssssssssssssssssssssssssssssssssssssssssssssssssss
+                {{ profile.full_name }}
+                <br>
+
             </div>
         </div>
-        <hr class="hr">
     </div>
+        <div class="d-flex mx-auto mt-3" style="max-width: 700px;">
+             <div class="container mx-3 overflow-hidden bio">
+                 {{ profile.bio }}
+             </div>
+        </div>
 </div>
 
 <div class="container text-center" style="max-width: 700px; min-width: 50%;">
+    <hr class="hr">
 <div class="btn-group">
     <a href="{% url 'profile' profile.id %}?active_tab=publications"
        class="btn btn-outline-secondary {% if active_tab != 'favourites' and active_tab != 'comments' %}active{% endif %}"
        aria-current="page">publications</a>
+{% if request.user.id == profile.id %}
     <a href="{% url 'profile' profile.id %}?active_tab=favourites"
-       class="btn btn-outline-secondary {% if active_tab == 'favourites' %}active{% endif %}">favourites</a>
-    <a href="{% url 'profile' profile.id %}?active_tab=comments"
-       class="btn btn-outline-secondary {% if active_tab == 'comments' %}active{% endif %}">comments</a>
-</div>
-    <hr class="hr">
-    {% if active_tab != 'favourites' and active_tab != 'comments' %}
-    {% include 'posts.html' %}
-    {% elif active_tab == 'favourites' %}
-    {% include 'favourites.html' %}
-    {% elif active_tab == 'comments' %}
-    {% include 'profile_comments.html' %}
-    {% endif %}
+   class="btn btn-outline-secondary {% if active_tab == 'favourites' %}active{% endif %}">favourites</a>
+{% endif %}
+<!--    <a href="{% url 'profile' profile.id %}?active_tab=comments"-->
+<!--       class="btn btn-outline-secondary {% if active_tab == 'comments' %}active{% endif %}">comments</a>-->
 
 </div>
+<div class="mt-3">
+{% include 'posts.html' %}
+<!--        {% if active_tab != 'favourites' and active_tab != 'comments' %}-->
+<!--    {% include 'posts.html' %}-->
+<!--    {% elif active_tab == 'favourites' %}-->
+<!--{% include 'posts.html' %}-->
+<!--        {% if request.user.id == profile.id %}-->
+<!--        {% endif %}-->
+<!--    {% endif %}-->
+</div>
+
+</div>
+<br>
 {% endblock %}

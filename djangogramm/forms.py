@@ -1,9 +1,13 @@
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django import forms
-from .models import User, Post, Media, Tag
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxLengthValidator
+from django import forms
 import re
+import os
+
+from .models import User, Post, Media, Tag
+
+NO_USER_AVATAR = os.getenv('NO_USER_AVATAR')
 
 
 class SignUpForm(UserCreationForm):
@@ -24,6 +28,22 @@ class SignUpForm(UserCreationForm):
         self.fields['password2'].widget.attrs['placeholder'] = 'Confirm Password'
 
 
+class EditProfileForm(UserChangeForm):
+
+    class Meta:
+        model = User
+        fields = ('avatar', 'bio', 'full_name')
+
+    def __init__(self, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.fields['avatar'].widget.attrs['class'] = 'form-control'
+        self.fields['full_name'].widget.attrs['class'] = 'form-control'
+        self.fields['bio'].widget = forms.Textarea(attrs={
+            'class': 'form-control',
+            'aria-label': 'With textarea',
+        })
+
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
@@ -34,7 +54,9 @@ class PostForm(forms.ModelForm):
 
         self.fields['description'].widget = forms.Textarea(attrs={
             'class': 'form-control',
-            'aria-label': 'With textarea'
+            'aria-label': 'With textarea',
+            'maxlength': 255,
+            'style': 'height: 170px;',
         })
 
     user = forms.HiddenInput()
@@ -48,9 +70,9 @@ class MediaForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(MediaForm, self).__init__(*args, **kwargs)
 
-        self.fields['image'].widget.attrs.update({'class': 'form-control'})
-        self.fields['image2'].widget.attrs.update({'class': 'form-control'})
-        self.fields['image3'].widget.attrs.update({'class': 'form-control'})
+        self.fields['image'].widget.attrs.update({'class': 'form-control form-control-sm'})
+        self.fields['image2'].widget.attrs.update({'class': 'form-control form-control-sm'})
+        self.fields['image3'].widget.attrs.update({'class': 'form-control form-control-sm'})
 
 
 def validate_tag(value):
@@ -65,15 +87,40 @@ def validate_tag(value):
             raise ValidationError('Tags should start with "#" and contain only Latin letters.')
 
 
+class EditPostForm(forms.Form):
+    description = forms.CharField(max_length=255, validators=[MaxLengthValidator(255)])
+    tags = forms.CharField(max_length=100, validators=[validate_tag])
+
+    def __init__(self, *args, **kwargs):
+        super(EditPostForm, self).__init__(*args, **kwargs)
+
+        self.fields['description'].widget = forms.Textarea(attrs={
+            'class': 'form-control',
+            'aria-label': 'With textarea',
+            'max-length': '255',
+            'style': 'height: 100px;'
+        })
+        self.fields['tags'].widget.attrs.update({'class': 'form-control'})
+
+
 class TagForm(forms.Form):
     tags = forms.CharField(max_length=100, validators=[validate_tag])
 
     def __init__(self, *args, **kwargs):
         super(TagForm, self).__init__(*args, **kwargs)
 
-        self.fields['tags'].widget.attrs.update({'class': 'form-control'})
-        self.fields[
-            'tags'].help_text = 'Define tags in a row like #mytag#anothertag'
+        # self.fields['tags'].widget.attrs.update({'class': 'form-control',
+        #                                          'maxlenght': 100,
+        #                                          'style': 'height: 100px;',
+        #                                          'aria-label': 'With textarea',
+        #                                          })
+        self.fields['tags'].widget = forms.Textarea(attrs={
+            'class': 'form-control',
+            'aria-label': 'With textarea',
+            'maxlength': 100,
+            'style': 'height: 70px;',
+        })
+        self.fields['tags'].help_text = 'Define tags in a row like #mytag#anothertag'
 
 
 class CommentForm(forms.Form):

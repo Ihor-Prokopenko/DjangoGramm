@@ -1,50 +1,28 @@
-from .utils import delete_media_file, delete_avatar_file, delete_preview_file
-from base.settings import MEDIA_ROOT
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_delete
-import os
 from django.urls import reverse
+import os
+
 from PIL import Image
 
-NO_USER_AVATAR = os.getenv('NO_USER_AVATAR')
-USER_AVATAR_UPLOAD = os.getenv('USER_AVATAR_UPLOAD')
-POST_IMAGES_UPLOAD = os.getenv('POST_IMAGES_UPLOAD')
-NO_PREVIEW_IMAGE = os.getenv('NO_PREVIEW_IMAGE')
+from base.settings import *
+from .utils import delete_media_file, delete_avatar_file, delete_preview_file
 
 TAG_STR_DISPLAY = "#{title}"
 USER_STR_DISPLAY = "@{username}"
-
-POST_IMAGE_SIZE = (640, 800)
-POST_PREVIEW_SIZE = (200, 200)
-POST_PREVIEW_ASPECT_RATIO = 1 / 1
-PREVIEW_IMAGE_SIZE = (200, 200)
-
-AVATAR_IMAGE_SIZE = (300, 300)
-AVATAR_ASPECT_RATIO = 1 / 1
 
 
 class User(AbstractUser):
     full_name = models.CharField(max_length=100, blank=True)
     bio = models.CharField(max_length=255, blank=True)
-    avatar = models.ImageField(upload_to=USER_AVATAR_UPLOAD, default=NO_USER_AVATAR, blank=True)
+    avatar = models.ImageField(upload_to=USER_AVATAR_UPLOAD, default=NO_USER_AVATAR)
     followers = models.ManyToManyField('self', related_name='follows', blank=True, null=True, symmetrical=False)
 
     def save(self, *args, **kwargs):
-        # cleaning old avatar if exists
-        try:
-            old_self = User.objects.get(pk=self.pk)
-        except ObjectDoesNotExist:
-            old_self = None
 
-        if old_self and old_self.avatar != self.avatar and old_self.avatar != NO_USER_AVATAR:
-            if old_self.avatar and os.path.isfile(old_self.avatar.path):
-                os.remove(old_self.avatar.path)
         super().save(*args, **kwargs)
-
-        # formatting uploaded avatar
-        if self.avatar and self.avatar != NO_USER_AVATAR:
+        if self.avatar:
             image = Image.open(self.avatar.path)
 
             target_width, target_height = AVATAR_IMAGE_SIZE
@@ -72,10 +50,13 @@ class User(AbstractUser):
 
             image.save(avatar_path, format='JPEG')
 
-            if self.avatar and os.path.isfile(self.avatar.path):
+            if self.avatar and self.avatar != os.path.join(USER_AVATAR_UPLOAD,
+                                                           avatar_filename) and os.path.isfile(
+                self.avatar.path) and self.avatar != NO_USER_AVATAR:
                 os.remove(self.avatar.path)
 
             self.avatar.name = os.path.join(USER_AVATAR_UPLOAD, avatar_filename)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return USER_STR_DISPLAY.format(username=self.username)
@@ -96,7 +77,11 @@ class Post(models.Model):
     date_created = models.DateTimeField(User, auto_now_add=True)
     date_modified = models.DateTimeField(User, auto_now=True, blank=True)
     likes = models.ManyToManyField(User, blank=True, related_name='liked')
+    saved = models.ManyToManyField(User, blank=True, related_name='saved')
     preview = models.ImageField(upload_to=POST_IMAGES_UPLOAD, default=NO_PREVIEW_IMAGE, blank=True)
+
+    class Meta:
+        ordering = ['-date_created']
 
     def generate_preview(self):
         post_media = self.images.first()
@@ -131,6 +116,14 @@ class Post(models.Model):
             self.preview.name = os.path.join(POST_IMAGES_UPLOAD, preview_filename)
             self.save()
 
+    def get_tags_string(self):
+        tags = self.tags.all()
+        tag_list = []
+        for tag in tags:
+            tag_list.append(tag.__str__())
+
+        return ''.join(tag_list)
+
     def get_absolute_url(self):
         return reverse('single_post', args=[self.pk])
 
@@ -139,6 +132,13 @@ class Post(models.Model):
         for comment in self.comments.all():
             count += comment.get_total_comments_count()
         return count
+
+    def get_max_height_image(self):
+        height_list = []
+        for image in self.images.all():
+            width, height = Image.open(image.image.path).size
+            height_list.append(int(height))
+        return max(height_list)
 
 
 class Media(models.Model):
@@ -159,6 +159,7 @@ class Comment(models.Model):
     text = models.CharField(max_length=255, blank=False)
     target_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', blank=True, null=True)
     target_comment = models.ForeignKey('self', on_delete=models.CASCADE, related_name='comments', blank=True, null=True)
+    by_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='all_comments', blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -167,6 +168,9 @@ class Comment(models.Model):
         for comment in self.comments.all():
             count += comment.get_total_comments_count()
         return count
+
+    class Meta:
+        ordering = ['-date_created']
 
 
 post_delete.connect(delete_avatar_file, sender=User)

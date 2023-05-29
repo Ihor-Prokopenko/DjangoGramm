@@ -138,3 +138,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Models settings
+
+NO_USER_AVATAR = os.getenv('NO_USER_AVATAR')
+USER_AVATAR_UPLOAD = os.getenv('USER_AVATAR_UPLOAD')
+POST_IMAGES_UPLOAD = os.getenv('POST_IMAGES_UPLOAD')
+NO_PREVIEW_IMAGE = os.getenv('NO_PREVIEW_IMAGE')
+
+
+POST_IMAGE_SIZE = (640, 800)
+POST_PREVIEW_SIZE = (200, 200)
+POST_PREVIEW_ASPECT_RATIO = 1 / 1
+
+AVATAR_IMAGE_SIZE = (300, 300)
+AVATAR_ASPECT_RATIO = 1 / 1

@@ -1,5 +1,6 @@
-from .models import Tag, User
 from django.core.cache import cache
+
+from .models import Tag, User
 
 
 def tags(request):

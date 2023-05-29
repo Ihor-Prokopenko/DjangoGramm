@@ -1,127 +1,20 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
 <div class="d-flex flex-column align-items-center text-light">
     {% if tag_slug and posts %}
-    <p>Publications tagged {{ tag_slug }}</p>
+    <p>Publications tagged #{{ tag_slug }}</p>
     {% elif tag_slug and not posts %}
-    <p>There is no publications tagged {{ tag_slug }}</p>
+    <p>There is no publications tagged #{{ tag_slug }}</p>
     {% else %}
     <p>Recent publications</p>
     {% endif %}
     {% for post in posts %}
 
-
-
-    <div class="card justify-content-center text-light" style="max-width: 700px; min-width: 50%;">
-        <div class="card-headercard-header d-flex justify-content-between align-items-center">
-
-            <div class="ms-1 mt-1">
-                <a class="nav-link d-flex" href="{% url 'profile' post.author.id %}"><img
-                        src="{{ post.author.avatar.url }}"
-                        width="50"
-                        class="rounded-circle"><strong>
-                    <h3 class="mt-2 ms-2">{{ post.author }}</h3></strong></a>
-            </div>
-
-            <div>
-                {% if user.id == post.author.id %}
-                <a href="{% url 'delete_post' post_id=post.id %}" class="btn-close btn-outline-danger btn-sm me-2"></a>
-                {% endif %}
-            </div>
-        </div>
-        <div class="">
-            <br>
-            {% include 'carousel.html' %}
-            <div class="card-text mx-3 mt-2">
-                <h5>
-                    {{ post.description }}
-                </h5>
-            </div>
-            <br>
-            <div class="d-flex justify-content-between">
-                <div class="d-flex align-self-start">
-                    <div>
-                        {% if user in post.likes.all %}
-                        <a class="nav-link" href="{% url 'like' post_id=post.id %}"><img
-                                src="{% static 'img/favorite_on.png' %}" width="30"
-                                class="">
-                        </a>
-                        {% else %}
-                        <a class="nav-link" href="{% url 'like' post_id=post.id %}"><img
-                                src="{% static 'img/favorite_off.png' %}" width="30"
-                                class=""></a>
-                        {% endif %}
-                        <div class="text-center"><span class="">{{ post.likes.count }}</span></div>
-                    </div>
-
-                    <div class="ms-2">
-
-                        <a class="nav-link" href="{% url 'single_post' post_id=post.id %}"><img
-                                src="{% static 'img/comment.png' %}"
-                                width="30"></a>
-                        <a class="nav-link" href="{% url 'single_post' post_id=post.id %}">
-                            <div class="text-center">
-                                <span class="">{{ post.get_total_comments_count }}</span>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="text-end">
-                    <a class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" href="#multiCollapseExample1"
-                       role="button"
-                       aria-expanded="false" aria-controls="multiCollapseExample1">comment</a>
-                    <div class="row">
-                        <div class="col">
-                            <div class="collapse multi-collapse" id="multiCollapseExample1">
-                                <div class="card card-body">
-                                    <form method="post" class=""
-                                          action="{% url 'comment_post' post_id=post.id %}">
-                                        <div class="mb-3">
-                                            {% csrf_token %}
-                                            {{ comment_form.as_p }}
-                                        </div>
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary">OK</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-
-
-            </div>
-
-            <hr class="hr">
-            <div class="container mb-3">
-                {% for tag in post.tags.all %}
-                <div class="btn btn-sm btn-secondary" role="alert"
-                     style="display: inline-block;">
-                    <a href="{% url 'feed' %}?tag={{ tag|urlencode }}" class="nav-link">{{ tag }}
-                    </a>
-                    {% if request.user.id == post.author.id %}
-                    <form method="POST" action="{% url 'remove_tag' post_id=post.id tag_title=tag.title %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-close" aria-label="Close"></button>
-                    </form>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-            <div class="card-footer text-secondary">
-                {{ post.date_created }}
-            </div>
-        </div>
-
-
-    </div>
+    {% include 'card.html' %}
     <hr>
     <br>
-    <br>
     {% endfor %}
-    {% endblock %}
 </div>
+{% endblock %}

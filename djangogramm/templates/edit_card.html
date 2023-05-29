@@ -12,7 +12,6 @@
         </div>
         <div>
             {% if user.id == post.author.id %}
-            <!--modal delete post-->
             <div class="modal" id="deleteModalPost-{{ post.id }}">
                 <div class="modal-dialog bg-dark">
                     <div class="modal-content">
@@ -23,71 +22,20 @@
                         <div class="modal-footer bg-dark d-flex justify-content-center">
                             <div class="text-center">
                                 <a href="{% url 'delete_post' post_id=post.id %}" class="btn btn-outline-danger me-2">
-                                    Delete</a>
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel
-                                </button>
+                                Delete</a>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!--modal edit post-->
-            <div class="modal" id="editModalPost-{{ post.id }}">
-                <div class="modal-dialog bg-dark">
-                    <div class="modal-content">
-                        <div class="model-header bg-dark d-flex justify-content-between">
-                            <p class="ms-3 mt-3">Edit your publication</p>
-                            <button type="button" class="btn-close me-3 mt-3" data-bs-dismiss="modal" aria-label="Close"></button>
 
-                        </div>
-                        <div class="modal-body bg-dark d-flex justify-content-center">
-                            <form method="post" class="w-100"
-                                  action="{% url 'edit_post' post_id=post.id %}"
-                                    >
-                                <div class="mb-3">
-                                    {% csrf_token %}
-
-                                    <div class="form-group">
-                                        <label for="descriptionByPost{{ post.id }}">Description: </label>
-                                        <textarea class="form-control" id="descriptionByPost{{ post.id }}"
-                                                  name="description"
-                                                  maxlength="255"
-                                                  placeholder="Enter description" style="height: 170px;">{{ post.description }}</textarea>
-                                    </div>
-                                    <div class="form-group mt-2">
-                                        <label for="tagsByPost{{ post.id }}">Tags: </label>
-                                        <textarea class="form-control" id="tagsByPost{{ post.id }}"
-                                                  maxlength="100"
-                                                  name="tags" placeholder="Enter tags"
-                                        >{{ post.get_tags_string }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-center">
-                                    <button type="submit" class="btn btn-outline-secondary me-2">OK</button>
-                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                        Cancel
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                        <!--                        <div class="modal-footer bg-dark d-flex justify-content-center">-->
-                        <!--                            <div class="text-center">-->
-                        <!--                                <a href="{% url 'delete_post' post_id=post.id %}" class="btn btn-outline-danger me-2">-->
-                        <!--                                Delete</a>-->
-                        <!--                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
-                    </div>
-                </div>
-            </div>
-            <!--modal menu-->
             <div class="nav-item dropdown">
                 <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <!--                    :-->
+<!--                    :-->
                 </button>
                 <ul class="dropdown-menu dropdown-menu-dark">
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
-                           data-bs-target="#editModalPost-{{ post.id }}">Edit</a></li>
+                    <li><a class="dropdown-item" href="#">Edit</a></li>
                     <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
                            data-bs-target="#deleteModalPost-{{ post.id }}">Delete</a></li>
                 </ul>
@@ -104,7 +52,6 @@
             {{ post.description }}
         </h5>
     </div>
-    <!--likes/comments/favourite icons    -->
     <div class="d-flex justify-content-between">
         <div class="d-flex align-self-start">
             <div>
@@ -144,7 +91,7 @@
                 {% endif %}
             </div>
         </div>
-        <!--comment post collapse-->
+
         <br>
         <div class="text-end">
             <a class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" href="#multiCollapseExample1"
@@ -174,23 +121,8 @@
 
     </div>
 
-    <!--tags-->
-    {% if post.tags.all %}
-<!--    <hr class="hr">-->
-    <div class="container mb-3">
-        {% for tag in post.tags.all %}
-        <div class="btn btn-sm btn-secondary" role="alert"
-             style="display: inline-block;">
-            <a href="{% url 'feed' %}?tag={{ tag|urlencode }}" class="nav-link">{{ tag }}
-            </a>
-        </div>
-        {% endfor %}
-    </div>
-
     {% endif %}
-<!--    <hr class="hr">-->
 </div>
 <div class="card-footer text-secondary">
-    {{ post.date_created|timesince }} ago
-    <hr class="hr">
+    {{ post.date_created }}
 </div>

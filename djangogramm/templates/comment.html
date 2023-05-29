@@ -1,0 +1,128 @@
+<div class="card card-body">
+    <div class="card-header">
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'profile' comment.author.id %}" class="nav-link"><img src="{{ comment.author.avatar.url }}"
+                                                                                  class="rounded-circle" width="30">
+                {{ comment.author.username }}</a>
+            <p class="text-secondary">{{ comment.date_created }}</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <p class="text-start">
+            {{ comment.text }}
+        </p>
+        <div class="d-flex justify-content-end">
+            <div>
+                <button class="btn btn-sm btn-outline-secondary me-1" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#answer{{ comment.id }}"
+                        aria-expanded="false" aria-controls="collapseExample">
+                    answer
+                </button>
+            </div>
+            <div>
+                {% if request.user.id == comment.author.id or request.user.id == comment.by_post.author.id %}
+                <a class="btn btn-outline-secondary btn-sm me-1" type="button" data-bs-toggle="collapse" data-bs-target="#comment{{ comment.id }}" aria-expanded="false" aria-controls="collapseWidthExample">
+                 Delete
+                </a>
+                <div class="collapse" id="comment{{ comment.id }}">
+                    <div class="d-flex">
+                    <form method="get" action="{% url 'delete_comment' comment_id=comment.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger me-1" aria-label="Close">OK</button>
+                    </form>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% if comment.comments.all %}
+            <div class="">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#{{ comment.id }}"
+                        aria-expanded="false" aria-controls="collapseExample">
+                    {{ comment.get_total_comments_count }}
+                </button>
+            </div>
+
+            {% endif %}
+
+        </div>
+        <div class="collapse" id="answer{{ comment.id }}">
+            <form method="post" class=""
+                  action="{% url 'comment_comment' comment_id=comment.id %}">
+                <div class="mb-3">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-sm btn-outline-secondary">OK</button>
+            </form>
+        </div>
+    </div>
+    <div class="collapse" id="{{ comment.id }}">
+
+        {% for com in comment.comments.all %}
+        <br>
+        <div class="card card-body">
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'profile' com.author.id %}" class="nav-link"><img src="{{ com.author.avatar.url }}"
+                                                                                  width="20"
+                                                                                  class="rounded-circle">
+                    {{ com.author.username}}</a>
+                <p class="text-secondary">{{ com.date_created }}</p>
+            </div>
+            <p class="ms-2">
+                {{ com.text }}
+            </p>
+            <div class="d-flex justify-content-end">
+                {% if request.user.id == com.author.id or request.user.id == com.by_post.author.id %}
+                <a class="btn btn-outline-secondary btn-sm me-1" type="button" data-bs-toggle="collapse" data-bs-target="#comment{{ com.id }}" aria-expanded="false" aria-controls="collapseWidthExample">
+                 Delete
+                </a>
+                <div class="collapse collapse-horizontal" id="comment{{ com.id }}">
+                    <div class="d-flex">
+                    <form method="get" action="{% url 'delete_comment' comment_id=com.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger me-1" aria-label="Close">OK</button>
+                    </form>
+<!--                    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#comment{{ com.id }}" aria-expanded="false" aria-controls="collapseWidthExample">-->
+<!--                     cancel-->
+<!--                    </button>-->
+                    </div>
+                </div>
+                {% endif %}
+
+            <!--                <div>-->
+            <!--                    <button class="btn btn-sm btn-outline-secondary me-1" type="button" data-bs-toggle="collapse"-->
+            <!--                            data-bs-target="#answer{{ com.id }}"-->
+            <!--                            aria-expanded="false" aria-controls="collapseExample">-->
+            <!--                        answer-->
+            <!--                    </button>-->
+            <!--                </div>-->
+            <!--                {% if com.comments.all %}-->
+            <!--                <div class="">-->
+            <!--                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"-->
+            <!--                            data-bs-toggle="collapse"-->
+            <!--                            data-bs-target="#{{ com.id }}"-->
+            <!--                            aria-expanded="false" aria-controls="collapseExample">-->
+            <!--                        {{ com.get_total_comments_count }}-->
+            <!--                    </button>-->
+            <!--                </div>-->
+
+            <!--                {% endif %}-->
+            <!--            </div>-->
+            <!--                <div class="collapse" id="answer{{ com.id }}">-->
+            <!--                <form method="post" class=""-->
+            <!--                      action="{% url 'comment_comment' comment_id=com.id %}">-->
+            <!--                    <div class="mb-3">-->
+            <!--                        {% csrf_token %}-->
+            <!--                        {{ comment_form.as_p }}-->
+            <!--                    </div>-->
+            <!--                    <button type="submit" class="btn btn-sm btn-outline-secondary">OK</button>-->
+            <!--                </form>-->
+        </div>
+    </div>
+    {% endfor %}
+</div>
+</div>
+<br>
+
