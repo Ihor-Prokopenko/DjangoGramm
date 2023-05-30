@@ -7,7 +7,7 @@ import os
 from PIL import Image
 
 from base.settings import *
-from .utils import delete_media_file, delete_avatar_file, delete_preview_file
+# from .utils import delete_media_file, delete_avatar_file, delete_preview_file
 
 TAG_STR_DISPLAY = "#{title}"
 USER_STR_DISPLAY = "@{username}"
@@ -22,7 +22,7 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
 
         super().save(*args, **kwargs)
-        if self.avatar:
+        if self.avatar and self.avatar != NO_USER_AVATAR:
             image = Image.open(self.avatar.path)
 
             target_width, target_height = AVATAR_IMAGE_SIZE
@@ -172,7 +172,7 @@ class Comment(models.Model):
     class Meta:
         ordering = ['-date_created']
 
-
-post_delete.connect(delete_avatar_file, sender=User)
-post_delete.connect(delete_media_file, sender=Media)
-post_delete.connect(delete_preview_file, sender=Post)
+#
+# post_delete.connect(delete_avatar_file, sender=User)
+# post_delete.connect(delete_media_file, sender=Media)
+# post_delete.connect(delete_preview_file, sender=Post)

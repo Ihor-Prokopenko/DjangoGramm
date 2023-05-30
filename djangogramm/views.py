@@ -1,13 +1,83 @@
 from django.core.paginator import Paginator
+
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import EmailMessage, send_mail
+
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView, CreateView, View, UpdateView
+from urllib import parse
 
 from .forms import *
 from .models import *
+from .tokens import account_activation_token
+
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except:
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        url = reverse('login') + '?status=activated'
+        messages.success(request, "Your email confirmed successfully!")
+        return redirect(url)
+    else:
+        messages.error(request, "The activation link is invalid or has expired!")
+        return redirect('secondary_email_confirmation')
+
+
+def activate_email(request, user, email_to):
+    mail_subject = 'Activate your account!'
+    message = render_to_string('activate_account_message.html', {
+        'user': user,
+        'domain': get_current_site(request).domain,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': account_activation_token.make_token(user),
+        'protocol': 'https' if request.is_secure() else 'http',
+    })
+
+    email = EmailMessage(mail_subject, message, to=[email_to])
+    if email.send():
+        messages.success(request,
+                         f'Confirmation link for @{user.username} was send to {email_to}! '
+                         f'The link will be workable only 2 hours*!')
+    else:
+        messages.error(request, f"Sending email error! {email_to}")
+
+
+def secondary_email_confirmation(request):
+    if request.method == 'POST':
+        form = SendEmailForm(request.POST)
+        if not form.is_valid():
+            for error in form.errors.values():
+                messages.error(request, error)
+            return render(request, 'confirmation.html', {'email_form': SendEmailForm()})
+        email = form.cleaned_data.get('email')
+        if not email:
+            return render(request, 'confirmation.html', {'email_form': SendEmailForm()})
+        user = User.objects.filter(email=email).first()
+        if not user:
+            messages.error(request, f"{email} is not registered!")
+            return render(request, 'confirmation.html', {'email_form': SendEmailForm()})
+        if user.is_active:
+            messages.error(request, "The user is already active!")
+            return redirect('feed')
+        activate_email(request, user, email)
+        return redirect('feed')
+    return render(request, 'confirmation.html', {'email_form': SendEmailForm()})
 
 
 def search_recognizer(request):
@@ -25,11 +95,13 @@ def search_recognizer(request):
         return redirect(reverse('profile_search') + f'?username={slug_clear}')
 
     elif '#' == search_slug[0]:
-        slug_clear = ''.join([slug for slug in search_slug.split('#') if slug])
-        url += f'?tag={slug_clear}'
+        # slug_clear = ''.join([slug for slug in search_slug.split('#') if slug])
+        encoded_search_slug = parse.quote(search_slug)
+        url += f'?tag={encoded_search_slug}'
     return redirect(url)
 
 
+@login_required
 def edit_post(request, post_id):
     post_obj = get_object_or_404(Post, id=post_id)
     if request.method == "POST" and request.user.id == post_obj.author.id:
@@ -47,6 +119,7 @@ def edit_post(request, post_id):
         return redirect('single_post', post_id=post_id)
 
 
+@login_required
 def logout_user(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -55,6 +128,7 @@ def logout_user(request):
     return redirect('feed')
 
 
+@login_required
 def delete_post(request, post_id=None):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -65,6 +139,7 @@ def delete_post(request, post_id=None):
     return redirect('feed')
 
 
+@login_required
 def like_action(request, post_id):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -77,6 +152,7 @@ def like_action(request, post_id):
     return redirect('single_post', post_id)
 
 
+@login_required
 def save_action(request, post_id):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -89,6 +165,7 @@ def save_action(request, post_id):
     return redirect('single_post', post_id)
 
 
+@login_required
 def remove_tag(request, post_id, tag_title):
     if not request.user.is_authenticated:
         return redirect('feed')
@@ -99,6 +176,7 @@ def remove_tag(request, post_id, tag_title):
     return redirect('feed')
 
 
+@login_required
 def delete_comment(request, comment_id):
     if not request.user.is_authenticated:
         return redirect('feed')
@@ -111,6 +189,7 @@ def delete_comment(request, comment_id):
         return redirect('single_post', parent_post.id)
 
 
+@login_required
 def follow_action(request, user_id):
     if not request.user.is_authenticated or request.user.id == user_id:
         return redirect('feed')
@@ -124,6 +203,7 @@ def follow_action(request, user_id):
     return redirect('profile', user_id)
 
 
+@method_decorator(login_required, name='dispatch')
 class FeedPage(ListView):
     model = Post
     template_name = 'feed.html'
@@ -138,15 +218,14 @@ class FeedPage(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        search_slug = self.request.session.get('search_slug')
-        if not search_slug:
-            search_slug = self.request.GET.get('tag')
+        search_slug = self.request.GET.get('tag')
         context['tag_slug'] = search_slug
         context['comment_form'] = CommentForm()
         context['edit_post_form'] = EditPostForm()
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class ShowPost(DetailView):
     model = Post
     template_name = 'single_post.html'
@@ -159,6 +238,7 @@ class ShowPost(DetailView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class CreatePost(CreateView):
     form_class = PostForm
     template_name = 'create_post.html'
@@ -197,6 +277,7 @@ class CreatePost(CreateView):
         return reverse('single_post', kwargs={'post_id': self.object.pk})
 
 
+@method_decorator(login_required, name='dispatch')
 class ShowProfile(DetailView):
     model = User
     template_name = 'profile.html'
@@ -207,7 +288,7 @@ class ShowProfile(DetailView):
         active_tab = self.request.GET.get('active_tab')
         data_list = self.object.saved.all() \
             if active_tab == 'favourites' \
-            and self.request.user.id == self.object.id \
+               and self.request.user.id == self.object.id \
             else self.object.posts.all()
 
         page_number = self.request.GET.get('page')
@@ -221,6 +302,7 @@ class ShowProfile(DetailView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class EditProfile(UpdateView):
     form_class = EditProfileForm
     template_name = 'edit_profile.html'
@@ -233,6 +315,7 @@ class EditProfile(UpdateView):
         return reverse('profile', kwargs={'pk': profile_id})
 
 
+@method_decorator(login_required, name='dispatch')
 class SearchProfile(ListView):
     paginate_by = 5
     model = User
@@ -259,11 +342,15 @@ class RegisterUser(CreateView):
 
     def form_valid(self, form):
         if form.is_valid():
-            user = form.save()
-            login(self.request, user)
-            messages.success(self.request, "You have successfully registered!")
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+            activate_email(self.request, user, form.cleaned_data.get('email'))
 
-            return redirect('profile', pk=user.id)
+            return redirect('feed')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(self.request, error)
 
 
 class LoginUser(LoginView):
@@ -271,10 +358,15 @@ class LoginUser(LoginView):
     template_name = 'login.html'
 
     def get_success_url(self):
+        status = self.request.GET.get('status')
+        if status == 'activated':
+            messages.success(self.request, "Complete the profile!")
+            return reverse_lazy('edit_profile')
         messages.success(self.request, "You have logged in!")
         return reverse_lazy('feed')
 
 
+@method_decorator(login_required, name='dispatch')
 class CommentView(View):
     def post(self, request, post_id=None, comment_id=None):
         if not request.user.is_authenticated:

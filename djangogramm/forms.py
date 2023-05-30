@@ -16,7 +16,7 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2', 'avatar')
+        fields = ('username', 'email', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
@@ -101,6 +101,10 @@ class EditPostForm(forms.Form):
             'style': 'height: 100px;'
         })
         self.fields['tags'].widget.attrs.update({'class': 'form-control'})
+
+
+class SendEmailForm(forms.Form):
+    email = forms.EmailField(max_length=100)
 
 
 class TagForm(forms.Form):

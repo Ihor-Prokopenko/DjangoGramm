@@ -1,6 +1,8 @@
 from django.urls import path
 
 from . import views
+from base.settings import LOGIN_URL
+
 
 post = [
     path('post/<int:post_id>/', views.ShowPost.as_view(), name='single_post'),
@@ -21,9 +23,11 @@ profile = [
 ]
 
 auth = [
-    path('login/', views.LoginUser.as_view(), name='login'),
+    path(LOGIN_URL, views.LoginUser.as_view(), name='login'),
     path('logout/', views.logout_user, name='logout'),
     path('register/', views.RegisterUser.as_view(), name='register'),
+    path('activate/<uidb64>/<token>', views.activate, name='activate'),
+    path('confirmation/', views.secondary_email_confirmation, name='secondary_email_confirmation'),
 ]
 
 interaction = [

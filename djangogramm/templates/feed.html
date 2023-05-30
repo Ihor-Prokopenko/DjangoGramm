@@ -4,7 +4,7 @@
 {% block content %}
 <div class="d-flex flex-column align-items-center text-light">
     {% if tag_slug and posts %}
-    <p>Publications tagged #{{ tag_slug }}</p>
+    <p>Publications tagged {{ tag_slug }}</p>
     {% elif tag_slug and not posts %}
     <p>There is no publications tagged #{{ tag_slug }}</p>
     {% else %}
