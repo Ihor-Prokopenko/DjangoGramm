@@ -109,7 +109,7 @@ def create_posts():
     users = User.objects.filter(is_staff=False).all()
     if not users:
         return False
-    for post in range(1, random.randint(35, 50)):
+    for post in range(1, random.randint(15, 20)):
         user = random.choice(users)
         create_fake_post(username=user.username)
 
