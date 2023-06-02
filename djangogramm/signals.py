@@ -2,11 +2,11 @@ from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 import os
 
-from .models import User, Media, Post
+from .models import User, Media, Post, Comment
 from base.settings import NO_USER_AVATAR, NO_PREVIEW_IMAGE
 
 
-@receiver(pre_save, sender=User)
+@receiver(post_delete, sender=User)
 def delete_avatar_file(sender, instance, **kwargs):
     if not instance.avatar:
         raise FileExistsError
@@ -14,7 +14,7 @@ def delete_avatar_file(sender, instance, **kwargs):
         os.remove(instance.avatar.path)
 
 
-@receiver(pre_save, sender=Media)
+@receiver(post_delete, sender=Media)
 def delete_media_file(sender, instance, **kwargs):
     if not instance.image:
         raise FileExistsError
@@ -22,7 +22,7 @@ def delete_media_file(sender, instance, **kwargs):
         os.remove(instance.image.path)
 
 
-@receiver(pre_save, sender=Post)
+@receiver(post_delete, sender=Post)
 def delete_preview_file(sender, instance, **kwargs):
     if not instance.preview:
         raise FileExistsError

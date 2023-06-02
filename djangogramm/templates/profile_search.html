@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
- <br>
 <div class="d-flex flex-column align-items-center text-light">
 {% if profiles %}
 
 {% if profile_slug %}
-There is results by @{{ profile_slug }}
+There is results by {{ profile_slug }}
 {% else %}
 All profiles
 {% endif %}
@@ -33,7 +32,7 @@ All profiles
 
 {% else %}
 
-No matches were found for @{{ profile_slug }}
+No matches were found for {{ profile_slug }}
 
 {% endif %}
 

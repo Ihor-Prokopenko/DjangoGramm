@@ -48,6 +48,11 @@
 
 
                 </li>
+                <li class="nav-item">
+                {% if request.user.is_superuser %}
+                <a class="nav-link ms-2" href="{% url 'fill_fake_data' %}">fill db</a>
+                {% endif %}
+                </li>
 
             </ul>
             <ul class="navbar-nav">

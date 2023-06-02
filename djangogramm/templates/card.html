@@ -11,7 +11,7 @@
                 <h4 class="mt-2 ms-2">{{ post.author }}</h4></strong></a>
         </div>
         <div>
-            {% if user.id == post.author.id %}
+            {% if user.id == post.author.id or request.user.is_staff %}
             <!--modal delete post-->
             <div class="modal" id="deleteModalPost-{{ post.id }}">
                 <div class="modal-dialog bg-dark">
@@ -100,9 +100,9 @@
         {% include 'carousel.html' %}
     </div>
     <div class="card-text mx-3 mt-2">
-        <h5>
+        <p>
             {{ post.description }}
-        </h5>
+        </p>
     </div>
     <!--likes/comments/favourite icons    -->
     <div class="d-flex justify-content-between">

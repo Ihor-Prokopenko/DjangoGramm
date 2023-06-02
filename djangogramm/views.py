@@ -19,6 +19,14 @@ from urllib import parse
 from .forms import *
 from .models import *
 from .tokens import account_activation_token
+from .fake_fill_db import main
+
+
+@login_required
+def fill_fake_data(request):
+    if request.user.is_superuser:
+        main()
+    return redirect('feed')
 
 
 def activate(request, uidb64, token):
@@ -92,10 +100,10 @@ def search_recognizer(request):
         user = User.objects.filter(username=slug_clear).first()
         if user:
             return redirect('profile', pk=user.id)
-        return redirect(reverse('profile_search') + f'?username={slug_clear}')
+        encoded_slug = parse.quote(search_slug)
+        return redirect(reverse('profile_search') + f'?username={encoded_slug}')
 
     elif '#' == search_slug[0]:
-        # slug_clear = ''.join([slug for slug in search_slug.split('#') if slug])
         encoded_search_slug = parse.quote(search_slug)
         url += f'?tag={encoded_search_slug}'
     return redirect(url)
@@ -133,7 +141,7 @@ def delete_post(request, post_id=None):
     if not request.user.is_authenticated:
         return redirect('login')
     post = get_object_or_404(Post, pk=post_id)
-    if request.user.id == post.author.id:
+    if request.user.id == post.author.id or request.user.is_staff:
         post.delete()
 
     return redirect('feed')
@@ -208,7 +216,7 @@ class FeedPage(ListView):
     model = Post
     template_name = 'feed.html'
     context_object_name = 'posts'
-    paginate_by = 2
+    paginate_by = 5
 
     def get_queryset(self):
         search_slug = self.request.GET.get('tag')
@@ -324,14 +332,15 @@ class SearchProfile(ListView):
 
     def get_queryset(self):
         profile_slug = self.request.GET.get('username')
+        decoded_slug = parse.unquote(profile_slug)[1:]
         if not profile_slug:
             return User.objects.all()
-        user_list = User.objects.filter(username__icontains=profile_slug).all()
+        user_list = User.objects.filter(username__icontains=decoded_slug).all()
         return user_list
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        profile_slug = self.request.GET.get('username')
+        profile_slug = parse.unquote(self.request.GET.get('username'))
         context['profile_slug'] = profile_slug
         return context
 

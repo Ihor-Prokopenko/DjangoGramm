@@ -28,6 +28,7 @@ auth = [
     path('register/', views.RegisterUser.as_view(), name='register'),
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
     path('confirmation/', views.secondary_email_confirmation, name='secondary_email_confirmation'),
+    path('fill_fake_data/', views.fill_fake_data, name='fill_fake_data')
 ]
 
 interaction = [

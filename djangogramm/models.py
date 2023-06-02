@@ -1,13 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import post_delete
 from django.urls import reverse
 import os
 
 from PIL import Image
 
 from base.settings import *
-# from .utils import delete_media_file, delete_avatar_file, delete_preview_file
 
 TAG_STR_DISPLAY = "#{title}"
 USER_STR_DISPLAY = "@{username}"
@@ -171,8 +169,3 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-date_created']
-
-#
-# post_delete.connect(delete_avatar_file, sender=User)
-# post_delete.connect(delete_media_file, sender=Media)
-# post_delete.connect(delete_preview_file, sender=Post)

@@ -84,45 +84,12 @@
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-outline-danger me-1" aria-label="Close">OK</button>
                     </form>
-<!--                    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#comment{{ com.id }}" aria-expanded="false" aria-controls="collapseWidthExample">-->
-<!--                     cancel-->
-<!--                    </button>-->
                     </div>
                 </div>
                 {% endif %}
-
-            <!--                <div>-->
-            <!--                    <button class="btn btn-sm btn-outline-secondary me-1" type="button" data-bs-toggle="collapse"-->
-            <!--                            data-bs-target="#answer{{ com.id }}"-->
-            <!--                            aria-expanded="false" aria-controls="collapseExample">-->
-            <!--                        answer-->
-            <!--                    </button>-->
-            <!--                </div>-->
-            <!--                {% if com.comments.all %}-->
-            <!--                <div class="">-->
-            <!--                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"-->
-            <!--                            data-bs-toggle="collapse"-->
-            <!--                            data-bs-target="#{{ com.id }}"-->
-            <!--                            aria-expanded="false" aria-controls="collapseExample">-->
-            <!--                        {{ com.get_total_comments_count }}-->
-            <!--                    </button>-->
-            <!--                </div>-->
-
-            <!--                {% endif %}-->
-            <!--            </div>-->
-            <!--                <div class="collapse" id="answer{{ com.id }}">-->
-            <!--                <form method="post" class=""-->
-            <!--                      action="{% url 'comment_comment' comment_id=com.id %}">-->
-            <!--                    <div class="mb-3">-->
-            <!--                        {% csrf_token %}-->
-            <!--                        {{ comment_form.as_p }}-->
-            <!--                    </div>-->
-            <!--                    <button type="submit" class="btn btn-sm btn-outline-secondary">OK</button>-->
-            <!--                </form>-->
         </div>
     </div>
     {% endfor %}
 </div>
 </div>
 <br>
-
