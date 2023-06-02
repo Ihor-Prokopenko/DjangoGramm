@@ -221,8 +221,19 @@ class FeedPage(ListView):
     def get_queryset(self):
         search_slug = self.request.GET.get('tag')
         if not search_slug:
-            return Post.objects.all().order_by('-date_created')
-        return Post.objects.filter(tags__slug__icontains=search_slug).order_by('-date_created')
+            return Post.objects.all().order_by('-date_created').prefetch_related('tags',
+                                                                                 'images',
+                                                                                 'comments',
+                                                                                 'likes',
+                                                                                 'saved').select_related(
+                                                                                                        'author')
+        return Post.objects.filter(tags__slug__icontains=search_slug
+                                   ).order_by('-date_created').prefetch_related('tags',
+                                                                                'images',
+                                                                                'comments',
+                                                                                'likes',
+                                                                                'saved').select_related(
+                                                                                                        'author')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -239,6 +250,15 @@ class ShowPost(DetailView):
     template_name = 'single_post.html'
     pk_url_kwarg = 'post_id'
     context_object_name = 'post'
+
+    def get_queryset(self):
+        return Post.objects.filter(pk=self.kwargs[self.pk_url_kwarg]).prefetch_related('tags',
+                                                                                       'images',
+                                                                                       'comments',
+                                                                                       'likes',
+                                                                                       'saved'
+                                                                                       ).select_related(
+                                                                                                        'author')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -291,6 +311,11 @@ class ShowProfile(DetailView):
     template_name = 'profile.html'
     pk_url_kwarg = 'pk'
 
+    def get_queryset(self):
+        return User.objects.filter(pk=self.kwargs[self.pk_url_kwarg]).prefetch_related('followers',
+                                                                                       'follows',
+                                                                                       'posts')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         active_tab = self.request.GET.get('active_tab')
@@ -334,8 +359,12 @@ class SearchProfile(ListView):
         profile_slug = self.request.GET.get('username')
         decoded_slug = parse.unquote(profile_slug)[1:]
         if not profile_slug:
-            return User.objects.all()
-        user_list = User.objects.filter(username__icontains=decoded_slug).all()
+            return User.objects.all().prefetch_related('followers',
+                                                       'follows',
+                                                       'posts')
+        user_list = User.objects.filter(username__icontains=decoded_slug).all().prefetch_related('followers',
+                                                                                                 'follows',
+                                                                                                 'posts')
         return user_list
 
     def get_context_data(self, *, object_list=None, **kwargs):
