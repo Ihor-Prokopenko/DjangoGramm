@@ -19,14 +19,6 @@ from urllib import parse
 from .forms import *
 from .models import *
 from .tokens import account_activation_token
-from .fake_fill_db import main
-
-
-@login_required
-def fill_fake_data(request):
-    if request.user.is_superuser:
-        main()
-    return redirect('feed')
 
 
 def activate(request, uidb64, token):
@@ -112,7 +104,7 @@ def search_recognizer(request):
 @login_required
 def edit_post(request, post_id):
     post_obj = get_object_or_404(Post, id=post_id)
-    if request.method == "POST" and request.user.id == post_obj.author.id:
+    if request.method == "POST" and request.user.id == post_obj.author.id or request.user.is_superuser:
         description = request.POST.get('description')
         tags = request.POST.get('tags')
         tags_cleaned = [tag for tag in tags.split('#') if tag]

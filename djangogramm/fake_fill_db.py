@@ -41,9 +41,9 @@ def create_fake_user(avatar_filename=None):
                                     full_name=full_name,
     )
     if user:
-        print(f"User '{user.username}' created!")
+
         username_list.append(user.username)
-        return user.username
+        return user
     else:
         print("There was an error!")
         return False
@@ -96,27 +96,45 @@ def create_fake_post(username=None):
     post.save()
     image_count = post.images.count()
     tag_count = post.tags.count()
-    print(f"Post id:{post.id} created! Images:{image_count},"
-          f" Tags:{tag_count}| {post.author.username}: {post.author.posts.count()}")
+    return post
 
 
 def create_users():
+    users_num = len(AVATAR_FILES_LIST)
+    curr_user_count = 1
     for avatar in AVATAR_FILES_LIST:
-        create_fake_user(avatar_filename=avatar)
+        user = create_fake_user(avatar_filename=avatar)
+        if user:
+            print(f"{curr_user_count}/{users_num} User '{user.username}' created!")
+            curr_user_count += 1
+    return True
 
 
 def create_posts():
     users = User.objects.filter(is_staff=False).all()
     if not users:
         return False
-    for post in range(1, random.randint(15, 20)):
+    posts_num = random.randint(15, 20)
+    curr_posts_count = 1
+    for post in range(1, posts_num + 1):
         user = random.choice(users)
-        create_fake_post(username=user.username)
+        post = create_fake_post(username=user.username)
+        if post:
+            images_count = post.images.count()
+            tag_count = post.tags.count()
+            print(f"{curr_posts_count}/{posts_num} Post id:{post.id} created! Images:{images_count},"
+                  f" Tags:{tag_count}| {post.author.username}: {post.author.posts.count()}")
+            curr_posts_count += 1
+
+    return True
 
 
 def main():
-    create_users()
-    create_posts()
+    users_bool = create_users()
+    posts_bool = create_posts()
+    if not users_bool and not posts_bool:
+        return False
+    return True
 
 
 if __name__ == '__main__':

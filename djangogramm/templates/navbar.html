@@ -49,9 +49,6 @@
 
                 </li>
                 {% if request.user.is_superuser %}
-                <li class="nav-item">
-                <a class="nav-link ms-4" href="{% url 'fill_fake_data' %}">fill db</a>
-                </li>
                 <li>
                     <a href="/admin" class="nav-link ms-3">adminpanel</a>
                 </li>

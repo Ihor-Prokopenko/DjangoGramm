@@ -7,4 +7,3 @@ class DjangogrammConfig(AppConfig):
 
     def ready(self):
         import djangogramm.signals
-        import djangogramm.fake_fill_db
