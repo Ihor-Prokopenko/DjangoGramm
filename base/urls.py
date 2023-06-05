@@ -19,6 +19,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.views.static import serve as mediaserve
+from setuptools.config._validate_pyproject.formats import url
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('djangogramm.urls')),
@@ -27,6 +30,6 @@ urlpatterns = [
 if settings.DEBUG:
     import debug_toolbar
 
-    urlpatterns = [
+    urlpatterns += [
         path('__debug__/', include('debug_toolbar.urls')),
-    ] + urlpatterns
+    ]
