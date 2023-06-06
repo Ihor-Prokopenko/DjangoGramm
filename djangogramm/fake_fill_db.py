@@ -2,7 +2,7 @@ from djangogramm.models import *
 import os
 from pathlib import Path
 from PIL import Image
-from base.settings import *
+from base.settings.base import *
 import random
 from faker import Faker
 

@@ -3,7 +3,7 @@ from django.dispatch import receiver
 import os
 
 from .models import User, Media, Post, Comment
-from base.settings import NO_USER_AVATAR, NO_PREVIEW_IMAGE
+from base.settings.base import NO_USER_AVATAR, NO_PREVIEW_IMAGE
 
 
 @receiver(post_delete, sender=User)

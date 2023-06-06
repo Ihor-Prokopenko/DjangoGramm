@@ -1,8 +1,7 @@
 from django.urls import path, include
 
 from . import views
-from base.settings import LOGIN_URL
-
+from base.settings.base import LOGIN_URL
 
 urlpatterns = [
     path('', views.FeedPage.as_view(), name='feed'),

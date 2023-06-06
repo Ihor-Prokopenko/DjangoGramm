@@ -5,7 +5,7 @@ import os
 
 from PIL import Image
 
-from base.settings import *
+from base.settings.base import *
 
 TAG_STR_DISPLAY = "#{title}"
 USER_STR_DISPLAY = "@{username}"

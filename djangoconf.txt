@@ -7,7 +7,7 @@ server{
 	location / {
 
 		include proxy_params;
-		proxy_pass http://unix:/home/ubuntu/elevate/app.sock;
+		proxy_pass http://unix:/home/ubuntu/task-11-decompose-project/app.sock;
 
 	}
 
