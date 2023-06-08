@@ -4,11 +4,14 @@
     <div class="card-headercard-header d-flex justify-content-between align-items-center">
 
         <div class="ms-1 mt-1">
-            <a class="nav-link d-flex" href="{% url 'profile' post.author.id %}"><img
-                    src="{{ post.author.avatar.url }}"
-                    width="50"
-                    class="rounded-circle"><strong>
-                <h4 class="mt-2 ms-2">{{ post.author }}</h4></strong></a>
+            <a class="nav-link d-flex" href="{% url 'profile' post.author.id %}">
+                {% if post.author.avatar %}
+                <img src="{{ post.author.avatar.url }}" width="50" class="rounded-circle me-1">
+                {% else %}
+                <img src="{% static 'img/no_avatar.png' %}" width="50" class="rounded-circle me-1">
+                {% endif %}
+                <strong>
+                    <h4 class="mt-2 ms-2">{{ post.author }}</h4></strong></a>
         </div>
         <div>
             {% if user.id == post.author.id or request.user.is_staff %}
@@ -37,13 +40,14 @@
                     <div class="modal-content">
                         <div class="model-header bg-dark d-flex justify-content-between">
                             <p class="ms-3 mt-3">Edit your publication</p>
-                            <button type="button" class="btn-close me-3 mt-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close me-3 mt-3" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
 
                         </div>
                         <div class="modal-body bg-dark d-flex justify-content-center">
                             <form method="post" class="w-100"
                                   action="{% url 'edit_post' post_id=post.id %}"
-                                    >
+                            >
                                 <div class="mb-3">
                                     {% csrf_token %}
 
@@ -176,7 +180,7 @@
 
     <!--tags-->
     {% if post.tags.all %}
-<!--    <hr class="hr">-->
+    <!--    <hr class="hr">-->
     <div class="container mb-3">
         {% for tag in post.tags.all %}
         <div class="btn btn-sm btn-secondary" role="alert"
@@ -188,7 +192,7 @@
     </div>
 
     {% endif %}
-<!--    <hr class="hr">-->
+    <!--    <hr class="hr">-->
 </div>
 <div class="card-footer text-secondary">
     {{ post.date_created|timesince }} ago

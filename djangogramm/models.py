@@ -1,9 +1,11 @@
+from cloudinary.api import resource
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
 import os
 
-from PIL import Image
+from cloudinary.models import CloudinaryField
+from cloudinary import uploader, CloudinaryImage
 
 from base.settings.base import *
 
@@ -14,46 +16,20 @@ USER_STR_DISPLAY = "@{username}"
 class User(AbstractUser):
     full_name = models.CharField(max_length=100, blank=True)
     bio = models.CharField(max_length=255, blank=True)
-    avatar = models.ImageField(upload_to=USER_AVATAR_UPLOAD, default=NO_USER_AVATAR)
+    avatar = CloudinaryField('image', blank=True, transformation={
+        'width': AVATAR_IMAGE_SIZE[0],
+        'height': AVATAR_IMAGE_SIZE[1],
+        'crop': 'fill',
+    })
     followers = models.ManyToManyField('self', related_name='follows', blank=True, null=True, symmetrical=False)
 
     def save(self, *args, **kwargs):
-
-        super().save(*args, **kwargs)
-        if self.avatar and self.avatar != NO_USER_AVATAR:
-            image = Image.open(self.avatar.path)
-
-            target_width, target_height = AVATAR_IMAGE_SIZE
-
-            aspect_ratio = AVATAR_ASPECT_RATIO
-            width, height = image.size
-            image_aspect_ratio = width / height
-
-            if image_aspect_ratio > aspect_ratio:
-                new_width = int(height * aspect_ratio)
-                left = (width - new_width) // 2
-                right = left + new_width
-                image = image.crop((left, 0, right, height))
-            elif image_aspect_ratio < aspect_ratio:
-                new_height = int(width / aspect_ratio)
-                top = (height - new_height) // 2
-                bottom = top + new_height
-                image = image.crop((0, top, width, bottom))
-
-            image = image.resize((target_width, target_height), Image.ANTIALIAS)
-            image = image.convert('RGB')
-
-            avatar_filename = f'avatar_{self.username}.jpg'
-            avatar_path = os.path.join(MEDIA_ROOT, USER_AVATAR_UPLOAD, avatar_filename)
-
-            image.save(avatar_path, format='JPEG')
-
-            if self.avatar and self.avatar != os.path.join(USER_AVATAR_UPLOAD,
-                                                           avatar_filename) and os.path.isfile(
-                self.avatar.path) and self.avatar != NO_USER_AVATAR:
-                os.remove(self.avatar.path)
-
-            self.avatar.name = os.path.join(USER_AVATAR_UPLOAD, avatar_filename)
+        try:
+            this = User.objects.get(id=self.id)
+            if this.avatar != self.avatar and this.avatar:
+                uploader.destroy(this.avatar.public_id)
+        except User.DoesNotExist:
+            pass
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -76,42 +52,33 @@ class Post(models.Model):
     date_modified = models.DateTimeField(User, auto_now=True, blank=True)
     likes = models.ManyToManyField(User, blank=True, related_name='liked')
     saved = models.ManyToManyField(User, blank=True, related_name='saved')
-    preview = models.ImageField(upload_to=POST_IMAGES_UPLOAD, default=NO_PREVIEW_IMAGE, blank=True)
+    preview = models.CharField(max_length=255, blank=True)
+    max_image_height = models.IntegerField(blank=True, null=True)
 
     class Meta:
         ordering = ['-date_created']
 
     def generate_preview(self):
+        height_list = []
+        images = self.images.all()
+        for image in images:
+            image_info = resource(image.image.public_id)
+            height = image_info.get('height', 0)
+            height_list.append(int(height))
+        self.max_image_height = max(height_list)
+
         post_media = self.images.first()
 
-        if post_media and post_media.image.path != self.preview.path:
-            image = Image.open(post_media.image.path)
-
-            target_width, target_height = POST_PREVIEW_SIZE
-
-            aspect_ratio = POST_PREVIEW_ASPECT_RATIO
-            width, height = image.size
-            image_aspect_ratio = width / height
-
-            if image_aspect_ratio > aspect_ratio:
-                new_width = int(height * aspect_ratio)
-                left = (width - new_width) // 2
-                right = left + new_width
-                image = image.crop((left, 0, right, height))
-            elif image_aspect_ratio < aspect_ratio:
-                new_height = int(width / aspect_ratio)
-                top = (height - new_height) // 2
-                bottom = top + new_height
-                image = image.crop((0, top, width, bottom))
-
-            image = image.resize((target_width, target_height), Image.ANTIALIAS)
-            image = image.convert('RGB')
-
-            preview_filename = f'preview_{self.id}.jpg'
-            preview_path = os.path.join(MEDIA_ROOT, POST_IMAGES_UPLOAD, preview_filename)
-
-            image.save(preview_path, format='JPEG')
-            self.preview.name = os.path.join(POST_IMAGES_UPLOAD, preview_filename)
+        if post_media:
+            image = CloudinaryImage(post_media.image.public_id)
+            width, height = POST_PREVIEW_SIZE
+            url = image.build_url(transformation={
+                'crop': 'fill',
+                'width': width,
+                'height': height,
+                'format': 'jpg',
+            }, secure=False)
+            self.preview = url
             self.save()
 
     def get_tags_string(self):
@@ -132,24 +99,15 @@ class Post(models.Model):
         return count
 
     def get_max_height_image(self):
-        height_list = []
-        for image in self.images.all():
-            width, height = Image.open(image.image.path).size
-            height_list.append(int(height))
-        return max(height_list)
+        return self.max_image_height
 
 
 class Media(models.Model):
-    image = models.ImageField(upload_to=POST_IMAGES_UPLOAD)
+    image = CloudinaryField('image', transformation={
+        'height': POST_IMAGE_SIZE[1],
+        'crop': 'scale',
+    })
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='images')
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        img = Image.open(self.image.path)
-
-        img.thumbnail(POST_IMAGE_SIZE)
-        img = img.convert('RGB')
-        img.save(self.image.path, format='JPEG')
 
 
 class Comment(models.Model):

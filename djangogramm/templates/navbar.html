@@ -15,6 +15,8 @@
                     <a class="nav-link" href="{% url 'profile' pk=request.user.id %}">
                         {% if request.user.avatar %}
                         <img src="{{ request.user.avatar.url }}" width="25" class="rounded-circle">
+                        {% else %}
+                        <img src="{% static 'img/no_avatar.png' %}" width="25" class="rounded-circle">
                         {% endif %}
                         {{ request.user.username }} </a>
 

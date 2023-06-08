@@ -1,15 +1,11 @@
 from djangogramm.models import *
-import os
-from pathlib import Path
-from PIL import Image
 from base.settings.base import *
 import random
-from faker import Faker
 
+from faker import Faker
 
 FAKE_AVATARS_DIR = 'fake/fake_avatars/'
 FAKE_POST_IMAGES_DIR = 'fake/fake_post_images/'
-
 
 AVATAR_FILES_LIST = os.listdir(MEDIA_URL + FAKE_AVATARS_DIR)
 POST_FILES_LIST = os.listdir(MEDIA_URL + FAKE_POST_IMAGES_DIR)
@@ -23,23 +19,27 @@ image_choices_list = []
 def create_fake_user(avatar_filename=None):
     if not avatar_filename:
         return False
-    avatar_file = Image.open(os.path.join(MEDIA_ROOT, FAKE_AVATARS_DIR, avatar_filename))
-    avatar_path = os.path.join(MEDIA_ROOT, USER_AVATAR_UPLOAD, avatar_filename)
-    avatar_file.save(avatar_path)
-    avatar_db_path = os.path.join(USER_AVATAR_UPLOAD, avatar_filename)
+    avatar_path = os.path.join(MEDIA_ROOT, FAKE_AVATARS_DIR, avatar_filename)
 
     username = fake.user_name()
     email = f'{username}@gmail.com'
     password = f'{username}password'
     full_name = fake.name()
     bio = fake.sentence(nb_words=random.randint(15, 30))
+
+    upload_result = cloudinary.uploader.upload(avatar_path,
+                                               transformation=[
+                                                   {'width': 200, 'height': 200, 'crop': 'fill'}
+                                               ])
+    avatar_url = upload_result['public_id'] if upload_result['public_id'] else None
+
     user = User.objects.create_user(username=username,
                                     email=email,
                                     password=password,
                                     bio=bio,
-                                    avatar=avatar_db_path,
+                                    avatar=avatar_url,
                                     full_name=full_name,
-    )
+                                    )
     if user:
 
         username_list.append(user.username)
@@ -60,15 +60,17 @@ def create_media(post_id):
             if len(image_choices_list) >= len(POST_FILES_LIST):
                 image_choices_list.clear()
     image_choices_list.append(filename)
-    file = Image.open(os.path.join(MEDIA_ROOT, FAKE_POST_IMAGES_DIR, filename))
-    filepath = os.path.join(MEDIA_ROOT, POST_IMAGES_UPLOAD, filename)
-    if os.path.isfile(filepath):
-        filename = f'{random.randint(100, 1000)}' + filename
-        filepath = os.path.join(MEDIA_ROOT, POST_IMAGES_UPLOAD, filename)
-    file.save(filepath)
-    file_db_path = os.path.join(POST_IMAGES_UPLOAD, filename)
+    file_path = os.path.join(MEDIA_ROOT, FAKE_POST_IMAGES_DIR, filename)
+    upload_result = cloudinary.uploader.upload(file_path,
+                                               transformation=[
+                                                   {
+                                                       'height': 700,
+                                                       'crop': 'scale',
+                                                   }
+                                               ])
+    file_url = upload_result['public_id'] if upload_result['public_id'] else None
 
-    media = Media.objects.create(image=file_db_path, post=post)
+    media = Media.objects.create(image=file_url, post=post)
     if not media:
         return False
 
@@ -86,7 +88,7 @@ def create_fake_post(username=None):
     post = Post.objects.create(author=user, description=description)
     for media in range(1, random.randint(2, 4)):
         create_media(post_id=post.id)
-    if post.images.exists():
+    if post.images:
         post.generate_preview()
 
     tags = random.choices(fake_tags, k=random.randint(3, 5))

@@ -2,29 +2,18 @@ from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 import os
 
-from .models import User, Media, Post, Comment
-from base.settings.base import NO_USER_AVATAR, NO_PREVIEW_IMAGE
+from cloudinary import uploader
+
+from .models import User, Media
 
 
 @receiver(post_delete, sender=User)
 def delete_avatar_file(sender, instance, **kwargs):
-    if not instance.avatar:
-        raise FileExistsError
-    if os.path.isfile(instance.avatar.path) and instance.avatar != NO_USER_AVATAR:
-        os.remove(instance.avatar.path)
+    if instance.avatar:
+        uploader.destroy(instance.avatar.public_id)
 
 
 @receiver(post_delete, sender=Media)
 def delete_media_file(sender, instance, **kwargs):
-    if not instance.image:
-        raise FileExistsError
-    if os.path.isfile(instance.image.path):
-        os.remove(instance.image.path)
-
-
-@receiver(post_delete, sender=Post)
-def delete_preview_file(sender, instance, **kwargs):
-    if not instance.preview:
-        raise FileExistsError
-    if os.path.isfile(instance.preview.path) and instance.preview != NO_PREVIEW_IMAGE:
-        os.remove(instance.preview.path)
+    if instance.image:
+        uploader.destroy(instance.image.public_id)

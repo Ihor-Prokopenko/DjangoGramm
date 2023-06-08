@@ -14,6 +14,10 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 
 load_dotenv()
 
@@ -175,9 +179,17 @@ POST_IMAGES_UPLOAD = os.getenv('POST_IMAGES_UPLOAD')
 NO_PREVIEW_IMAGE = os.getenv('NO_PREVIEW_IMAGE')
 
 
-POST_IMAGE_SIZE = (640, 800)
+POST_IMAGE_SIZE = (640, 700)
 POST_PREVIEW_SIZE = (200, 200)
 POST_PREVIEW_ASPECT_RATIO = 1 / 1
 
-AVATAR_IMAGE_SIZE = (300, 300)
+AVATAR_IMAGE_SIZE = (200, 200)
 AVATAR_ASPECT_RATIO = 1 / 1
+
+# Cloudinary integration
+
+cloudinary.config(
+    cloud_name=os.getenv('CLOUD_NAME'),
+    api_key=os.getenv('CLOUD_API_KEY'),
+    api_secret=os.getenv('CLOUD_API_SECRET'),
+)

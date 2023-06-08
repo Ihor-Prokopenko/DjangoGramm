@@ -8,7 +8,11 @@
         <div class="">
             <div class="">
                 <div class="me-3 text-center mt-3">
+                    {% if profile.avatar %}
                     <img src="{{ profile.avatar.url }}" width="150" class="rounded-circle">
+                    {% else %}
+                    <img src="{% static 'img/no_avatar.png' %}" width="150" class="rounded-circle">
+                    {% endif %}
                 </div>
 
             </div>
@@ -34,7 +38,7 @@
                     </a>
                 </div>
                 <hr class="hr">
-                <div class="d-flex mt-2">
+                <div class="d-flex flex-wrap mt-2">
                     <h6 class="me-3">Publications {{ profile.posts.count }}
                     </h6>
                     <h6 class="me-3">

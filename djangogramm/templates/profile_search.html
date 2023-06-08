@@ -2,39 +2,43 @@
 {% load static %}
 {% block content %}
 <div class="d-flex flex-column align-items-center text-light">
-{% if profiles %}
+    {% if profiles %}
 
-{% if profile_slug %}
-There is results by {{ profile_slug }}
-{% else %}
-All profiles
-{% endif %}
-<br>
-
-
-{% for profile in profiles %}
-<br>
-
-<a class="nav-link" href="{% url 'profile' profile.id %}">
-    <div class="card text-light">
-        <div class="card-body d-flex align-items-center">
-            <img src="{{ profile.avatar.url }}" width="50" class="rounded-circle me-1">
-            <h4 class="me-3">@{{ profile.username }}</h4>
-            <span class="badge bg-secondary me-2">Followers:{{profile.followers.count }}</span>
+    {% if profile_slug %}
+    There is results by {{ profile_slug }}
+    {% else %}
+    All profiles
+    {% endif %}
+    <br>
 
 
+    {% for profile in profiles %}
+    <br>
+
+    <a class="nav-link" href="{% url 'profile' profile.id %}">
+        <div class="card text-light">
+            <div class="card-body d-flex align-items-center">
+                {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}" width="50" class="rounded-circle me-1">
+                {% else %}
+                <img src="{% static 'img/no_avatar.png' %}" width="50" class="rounded-circle me-1">
+                {% endif %}
+                <h4 class="me-3">@{{ profile.username }}</h4>
+                <span class="badge bg-secondary me-2">Followers:{{profile.followers.count }}</span>
+
+
+            </div>
         </div>
-    </div>
-</a>
+    </a>
 
-{% endfor %}
+    {% endfor %}
 
 
-{% else %}
+    {% else %}
 
-No matches were found for {{ profile_slug }}
+    No matches were found for {{ profile_slug }}
 
-{% endif %}
+    {% endif %}
 
 </div>
 <br>
