@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView, CreateView, View, UpdateView
+from django.http import JsonResponse
 from urllib import parse
 
 from .forms import *
@@ -141,15 +142,26 @@ def delete_post(request, post_id=None):
 
 @login_required
 def like_action(request, post_id):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    post = get_object_or_404(Post, id=post_id)
+    if request.method == "POST":
+        post = get_object_or_404(Post, id=post_id)
 
-    if not post.likes.filter(id=request.user.id).exists():
-        post.likes.add(request.user)
-        return redirect('single_post', post_id)
-    post.likes.remove(request.user)
-    return redirect('single_post', post_id)
+        if not post.likes.filter(id=request.user.id).exists():
+            post.likes.add(request.user)
+            data = {
+                'value': 'added',
+                'likes_num': post.likes.count()
+            }
+            # return redirect('single_post', post_id)
+            return JsonResponse(data, safe=False)
+
+        post.likes.remove(request.user)
+        data = {
+            'value': 'removed',
+            'likes_num': post.likes.count()
+        }
+        # return redirect('single_post', post_id)
+        return JsonResponse(data, safe=False)
+    return redirect('feed')
 
 
 @login_required

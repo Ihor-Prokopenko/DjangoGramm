@@ -74,13 +74,6 @@
                                 </div>
                             </form>
                         </div>
-                        <!--                        <div class="modal-footer bg-dark d-flex justify-content-center">-->
-                        <!--                            <div class="text-center">-->
-                        <!--                                <a href="{% url 'delete_post' post_id=post.id %}" class="btn btn-outline-danger me-2">-->
-                        <!--                                Delete</a>-->
-                        <!--                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
                     </div>
                 </div>
             </div>
@@ -112,17 +105,23 @@
     <div class="d-flex justify-content-between">
         <div class="d-flex align-self-start">
             <div>
-                {% if user in post.likes.all %}
-                <a class="nav-link" href="{% url 'like' post_id=post.id %}"><img
-                        src="{% static 'img/favorite_on.png' %}" width="30"
-                        class="">
-                </a>
-                {% else %}
-                <a class="nav-link" href="{% url 'like' post_id=post.id %}"><img
-                        src="{% static 'img/favorite_off.png' %}" width="30"
-                        class=""></a>
-                {% endif %}
-                <div class="text-center"><span class="">{{ post.likes.count }}</span></div>
+<form class="like-form" id="{{ post.id }}" action="{% url 'like' post_id=post.id %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="post_id" value="{{ post.id }}">
+    <button type="submit" class="like-btn{{ post.id }}">
+        {% if request.user in post.likes.all %}
+            <img src="/static/img/favorite_on.png" width="30" class="">
+        {% else %}
+            <img src="/static/img/favorite_off.png" width="30" class="">
+        {% endif %}
+    </button>
+    <div class="text-center like-count{{ post.id }}">
+        {{ post.likes.count }}
+    </div>
+</form>
+
+
+<!--                <div class="text-center"><span class="">{{ post.likes.count }}</span></div>-->
             </div>
 
             <div class="ms-2">
