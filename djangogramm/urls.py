@@ -9,10 +9,10 @@ urlpatterns = [
         'posts/',
         include(
             [
-                path('details/<int:post_id>/', views.ShowPost.as_view(), name='single_post'),
-                path('edit_post/<int:post_id>/', views.edit_post, name='edit_post'),
+                path('<int:post_id>/', views.ShowPost.as_view(), name='single_post'),
+                path('<int:post_id>/edit_post/', views.edit_post, name='edit_post'),
+                path('<int:post_id>/delete_post/', views.delete_post, name='delete_post'),
                 path('new_post/', views.CreatePost.as_view(), name='new_post'),
-                path('delete_post/<int:post_id>/', views.delete_post, name='delete_post'),
             ]
         ),
     ),
@@ -32,9 +32,9 @@ urlpatterns = [
         'comments/',
         include(
             [
-                path('comment_post/<int:post_id>/', views.CommentView.as_view(), name='comment_post'),
-                path('comment_comment/<int:comment_id>/', views.CommentView.as_view(), name='comment_comment'),
-                path('delete_comment/<int:comment_id>/', views.delete_comment, name='delete_comment'),
+                path('<int:post_id>/comment_post/', views.CommentView.as_view(), name='comment_post'),
+                path('<int:comment_id>/comment_comment/', views.CommentView.as_view(), name='comment_comment'),
+                path('<int:comment_id>/delete_comment/', views.delete_comment, name='delete_comment'),
             ]
         ),
     ),

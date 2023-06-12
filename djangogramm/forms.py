@@ -113,11 +113,6 @@ class TagForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(TagForm, self).__init__(*args, **kwargs)
 
-        # self.fields['tags'].widget.attrs.update({'class': 'form-control',
-        #                                          'maxlenght': 100,
-        #                                          'style': 'height: 100px;',
-        #                                          'aria-label': 'With textarea',
-        #                                          })
         self.fields['tags'].widget = forms.Textarea(attrs={
             'class': 'form-control',
             'aria-label': 'With textarea',

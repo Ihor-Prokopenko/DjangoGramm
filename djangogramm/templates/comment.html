@@ -1,8 +1,13 @@
+{% load static %}
 <div class="card card-body">
     <div class="card-header">
         <div class="d-flex justify-content-between">
-            <a href="{% url 'profile' comment.author.id %}" class="nav-link"><img src="{{ comment.author.avatar.url }}"
-                                                                                  class="rounded-circle" width="30">
+            <a href="{% url 'profile' comment.author.id %}" class="nav-link">
+                        {% if comment.author.avatar %}
+                        <img src="{{ comment.author.avatar.url }}" width="25" class="rounded-circle">
+                        {% else %}
+                        <img src="{% static 'img/no_avatar.png' %}" width="25" class="rounded-circle">
+                        {% endif %}
                 {{ comment.author.username }}</a>
             <p class="text-secondary">{{ comment.date_created }}</p>
         </div>
@@ -64,9 +69,12 @@
         <br>
         <div class="card card-body">
             <div class="d-flex justify-content-between">
-                <a href="{% url 'profile' com.author.id %}" class="nav-link"><img src="{{ com.author.avatar.url }}"
-                                                                                  width="20"
-                                                                                  class="rounded-circle">
+                <a href="{% url 'profile' com.author.id %}" class="nav-link">
+                        {% if comment.author.avatar %}
+                        <img src="{{ comment.author.avatar.url }}" width="20" class="rounded-circle">
+                        {% else %}
+                        <img src="{% static 'img/no_avatar.png' %}" width="20" class="rounded-circle">
+                        {% endif %}
                     {{ com.author.username}}</a>
                 <p class="text-secondary">{{ com.date_created }}</p>
             </div>

@@ -135,7 +135,7 @@
                     </div>
                 </a>
             </div>
-            <div class="ms-1">
+            <div class="ms-3">
                 <form class="post-save-form" id="save{{ post.id }}" action="{% url 'save_post' post_id=post.id %}" method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="post_id" value="{{ post.id }}">
@@ -149,16 +149,6 @@
                 </form>
 
 
-
-<!--                {% if user in post.saved.all %}-->
-<!--                <a class="nav-link" href="{% url 'save_post' post_id=post.id %}">-->
-<!--                    <img src="{% static 'img/pin_on.png' %}" width="30">-->
-<!--                </a>-->
-<!--                {% else %}-->
-<!--                <a class="nav-link" href="{% url 'save_post' post_id=post.id %}">-->
-<!--                    <img src="{% static 'img/pin_off.png' %}" width="30">-->
-<!--                </a>-->
-<!--                {% endif %}-->
             </div>
         </div>
         <!--comment post collapse-->
