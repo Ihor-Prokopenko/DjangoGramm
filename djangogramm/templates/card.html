@@ -104,27 +104,27 @@
     <!--likes/comments/favourite icons    -->
     <div class="d-flex justify-content-between">
         <div class="d-flex align-self-start">
-            <div>
-<form class="like-form" id="{{ post.id }}" action="{% url 'like' post_id=post.id %}" method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="post_id" value="{{ post.id }}">
-    <button type="submit" class="like-btn{{ post.id }}">
-        {% if request.user in post.likes.all %}
-            <img src="/static/img/favorite_on.png" width="30" class="">
-        {% else %}
-            <img src="/static/img/favorite_off.png" width="30" class="">
-        {% endif %}
-    </button>
-    <div class="text-center like-count{{ post.id }}">
-        {{ post.likes.count }}
-    </div>
-</form>
+            <div class="ms-2">
+                <form class="like-form" id="{{ post.id }}" action="{% url 'like' post_id=post.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <button type="submit" class="like-btn{{ post.id }} hidden-btn">
+                        {% if request.user in post.likes.all %}
+                            <img src="/static/img/favorite_on.png" width="30" class="">
+                        {% else %}
+                            <img src="/static/img/favorite_off.png" width="30" class="">
+                        {% endif %}
+                    </button>
+                    <div class="text-center like-count{{ post.id }}">
+                        {{ post.likes.count }}
+                    </div>
+                </form>
+            </div>
 
 
 <!--                <div class="text-center"><span class="">{{ post.likes.count }}</span></div>-->
-            </div>
 
-            <div class="ms-2">
+            <div class="ms-3">
 
                 <a class="nav-link" href="{% url 'single_post' post_id=post.id %}"><img
                         src="{% static 'img/comment.png' %}"
@@ -135,16 +135,30 @@
                     </div>
                 </a>
             </div>
-            <div class="ms-2">
-                {% if user in post.saved.all %}
-                <a class="nav-link" href="{% url 'save_post' post_id=post.id %}">
-                    <img src="{% static 'img/pin_on.png' %}" width="30">
-                </a>
-                {% else %}
-                <a class="nav-link" href="{% url 'save_post' post_id=post.id %}">
-                    <img src="{% static 'img/pin_off.png' %}" width="30">
-                </a>
-                {% endif %}
+            <div class="ms-1">
+                <form class="post-save-form" id="save{{ post.id }}" action="{% url 'save_post' post_id=post.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <button type="submit" class="save-btn{{ post.id }} hidden-btn">
+                        {% if request.user in post.saved.all %}
+                            <img src="{% static 'img/pin_on.png' %}" width="30">
+                        {% else %}
+                            <img src="{% static 'img/pin_off.png' %}" width="30">
+                        {% endif %}
+                    </button>
+                </form>
+
+
+
+<!--                {% if user in post.saved.all %}-->
+<!--                <a class="nav-link" href="{% url 'save_post' post_id=post.id %}">-->
+<!--                    <img src="{% static 'img/pin_on.png' %}" width="30">-->
+<!--                </a>-->
+<!--                {% else %}-->
+<!--                <a class="nav-link" href="{% url 'save_post' post_id=post.id %}">-->
+<!--                    <img src="{% static 'img/pin_off.png' %}" width="30">-->
+<!--                </a>-->
+<!--                {% endif %}-->
             </div>
         </div>
         <!--comment post collapse-->

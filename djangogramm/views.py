@@ -166,15 +166,22 @@ def like_action(request, post_id):
 
 @login_required
 def save_action(request, post_id):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        post = get_object_or_404(Post, id=post_id)
 
-    if not post.saved.filter(id=request.user.id).exists():
-        post.saved.add(request.user)
-        return redirect('single_post', post_id)
-    post.saved.remove(request.user)
-    return redirect('single_post', post_id)
+        if not post.saved.filter(id=request.user.id).exists():
+            post.saved.add(request.user)
+            data = {
+                'value': 'saved'
+            }
+            return JsonResponse(data, safe=False)
+
+        post.saved.remove(request.user)
+        data = {
+            'value': 'unsaved'
+        }
+        return JsonResponse(data, safe=False)
+    return redirect('feed')
 
 
 @login_required
@@ -205,14 +212,25 @@ def delete_comment(request, comment_id):
 def follow_action(request, user_id):
     if not request.user.is_authenticated or request.user.id == user_id:
         return redirect('feed')
-    target_user = get_object_or_404(User, pk=user_id)
-    target_followers = target_user.followers.all()
+    if request.method == 'POST':
+        target_user = get_object_or_404(User, pk=user_id)
+        target_followers = target_user.followers.all()
 
-    if request.user not in target_followers:
-        target_user.followers.add(request.user)
-        return redirect('profile', user_id)
-    target_user.followers.remove(request.user)
-    return redirect('profile', user_id)
+        if request.user not in target_followers:
+            target_user.followers.add(request.user)
+            data = {
+                'action': 'followed',
+                'followers': target_user.followers.count(),
+            }
+
+            return JsonResponse(data, safe=False)
+        target_user.followers.remove(request.user)
+        data = {
+            'action': 'unfollowed',
+            'followers': target_user.followers.count(),
+        }
+        return JsonResponse(data, safe=False)
+    return redirect('feed')
 
 
 @method_decorator(login_required, name='dispatch')

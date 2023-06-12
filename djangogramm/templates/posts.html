@@ -5,7 +5,7 @@
             <a href="{% url 'single_post' post_id=post.id %}" class="">
                     {% if post.preview %}
                     <img src="{{ post.preview }}" class="mb-3"
-                          style="max-width: 200px;">
+                          style="max-width: 200px; min-width: auto;">
                     {% endif %}
 
             </a>

@@ -23,6 +23,7 @@ module.exports = {
     plugins: [
         new MiniCssExtractPlugin({
             filename: '../css/index.css',
+            filename: '../css/DG_styles.css',
         }),
         new webpack.ProvidePlugin({
             $: 'jquery',

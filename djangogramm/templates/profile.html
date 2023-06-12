@@ -23,29 +23,34 @@
                     <a class="container nav-link">
                         <h4 class="">{{ profile.username }}</h4>
                     </a>
-                    <a class="d-flex">
                         {% if request.user.id != profile.id %}
+                        <form class="follow-form" id="follow{{ profile.id }}"
+                              action="{% url 'follow' user_id=profile.id %}"
+                              method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_id" value="{{ profile.id }}">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm follow-btn{{ profile.id }}">
                         {% if request.user in profile.followers.all %}
-                        <div><a href="{% url 'follow' user_id=profile.id %}" class="btn btn-outline-danger btn-sm me-2">Unfollow</a>
-                        </div>
+                            Unfollow
                         {% else %}
-                        <div><a href="{% url 'follow' user_id=profile.id %}"
-                                class="btn btn-outline-secondary btn-sm me-2">Follow</a></div>
+                            Follow
+                        </button>
+                        </form>
                         {% endif %}
                         {% else %}
                         <a class="nav-link" href="{% url 'edit_profile' %}"><img src="{% static 'img/edit.png' %}" width="20"></a>
                         {% endif %}
-                    </a>
+
                 </div>
                 <hr class="hr">
                 <div class="d-flex flex-wrap mt-2">
                     <h6 class="me-3">Publications {{ profile.posts.count }}
                     </h6>
                     <h6 class="me-3">
-                        <a class="nav-link" type="button" data-bs-toggle="offcanvas"
+                        <a class="nav-link d-flex" type="button" data-bs-toggle="offcanvas"
                            data-bs-target="#offcanvasScrollingFollowers"
                            aria-controls="offcanvasScrollingFollowers">Followers
-                            {{profile.followers.count }}
+                            <div class="ms-1 followers-count" id="followers-count">{{profile.followers.count }}</div>
                         </a>
 
                         <div class="offcanvas offcanvas-start text-bg-dark" data-bs-scroll="true"
