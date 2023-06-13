@@ -6,13 +6,14 @@ from base.settings.base import LOGIN_URL
 urlpatterns = [
     path('', views.FeedPage.as_view(), name='feed'),
     path(
-        'posts/',
+        'post/',
         include(
             [
                 path('<int:post_id>/', views.ShowPost.as_view(), name='single_post'),
-                path('<int:post_id>/edit_post/', views.edit_post, name='edit_post'),
-                path('<int:post_id>/delete_post/', views.delete_post, name='delete_post'),
-                path('new_post/', views.CreatePost.as_view(), name='new_post'),
+                path('<int:post_id>/edit/', views.edit_post, name='edit_post'),
+                path('<int:post_id>/delete/', views.delete_post, name='delete_post'),
+                path('create/', views.CreatePost.as_view(), name='new_post'),
+                path('<int:post_id>/comment/', views.CommentView.as_view(), name='comment_post'),
             ]
         ),
     ),
@@ -29,12 +30,11 @@ urlpatterns = [
         ),
     ),
     path(
-        'comments/',
+        'comment/',
         include(
             [
-                path('<int:post_id>/comment_post/', views.CommentView.as_view(), name='comment_post'),
-                path('<int:comment_id>/comment_comment/', views.CommentView.as_view(), name='comment_comment'),
-                path('<int:comment_id>/delete_comment/', views.delete_comment, name='delete_comment'),
+                path('<int:comment_id>/answer/', views.CommentView.as_view(), name='comment_comment'),
+                path('<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
             ]
         ),
     ),
@@ -43,7 +43,7 @@ urlpatterns = [
         include(
             [
                 path('details/<int:pk>/', views.ShowProfile.as_view(), name='profile'),
-                path('edit_profile/', views.EditProfile.as_view(), name='edit_profile'),
+                path('edit/', views.EditProfile.as_view(), name='edit_profile'),
             ]
         ),
     ),
@@ -52,7 +52,7 @@ urlpatterns = [
         include(
             [
                 path('profile/', views.SearchProfile.as_view(), name='profile_search'),
-                path('search/', views.search_recognizer, name='search_recognizer'),
+                path('index/', views.search_recognizer, name='search_recognizer'),
             ]
         ),
     ),
@@ -60,10 +60,10 @@ urlpatterns = [
         'interaction/',
         include(
             [
-                path('like/<int:post_id>/', views.like_action, name='like'),
-                path('save_post/<int:post_id>/', views.save_action, name='save_post'),
-                path('follow/<int:user_id>/', views.follow_action, name='follow'),
-                path('remove_tag/<int:post_id>/<str:tag_title>/', views.remove_tag, name='remove_tag'),
+                path('<int:post_id>/like/', views.like_action, name='like'),
+                path('<int:post_id>/save/', views.save_action, name='save_post'),
+                path('<int:user_id>/follow/', views.follow_action, name='follow'),
+                path('<int:post_id>/remove_tag/<str:tag_title>/', views.remove_tag, name='remove_tag'),
             ]
         ),
     ),

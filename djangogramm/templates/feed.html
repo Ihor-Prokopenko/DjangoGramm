@@ -6,7 +6,7 @@
     {% if tag_slug and posts %}
     <p>Publications tagged {{ tag_slug }}</p>
     {% elif tag_slug and not posts %}
-    <p>There is no publications tagged #{{ tag_slug }}</p>
+    <p>There is no publications tagged {{ tag_slug }}</p>
     {% else %}
     <p>Recent publications</p>
     {% endif %}
