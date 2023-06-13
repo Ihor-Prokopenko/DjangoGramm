@@ -77,6 +77,7 @@ Choice is MySQL to try first time with it.
 
 # 6. Fill database with fake data, then test it work
 
+
 ~
 
 # 7. Deploy project to the server
