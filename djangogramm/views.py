@@ -14,7 +14,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView, CreateView, View, UpdateView
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404, HttpResponseRedirect
 from urllib import parse
 
 from .forms import *
@@ -81,7 +81,7 @@ def secondary_email_confirmation(request):
     return render(request, 'confirmation.html', {'email_form': SendEmailForm()})
 
 
-def search_recognizer(request):
+def search_handler(request):
     search_slug = request.GET.get('q')
     url = reverse('feed')
 
@@ -209,11 +209,11 @@ def delete_comment(request, comment_id):
 
 
 @login_required
-def follow_action(request, user_id):
-    if not request.user.is_authenticated or request.user.id == user_id:
+def follow_action(request, pk):
+    if not request.user.is_authenticated or request.user.id == pk:
         return redirect('feed')
     if request.method == 'POST':
-        target_user = get_object_or_404(User, pk=user_id)
+        target_user = get_object_or_404(User, pk=pk)
         target_followers = target_user.followers.all()
 
         if request.user not in target_followers:
@@ -352,12 +352,21 @@ class EditProfile(UpdateView):
     form_class = EditProfileForm
     template_name = 'edit_profile.html'
 
-    def get_object(self):
-        return self.request.user
+    def get_object(self, queryset=None):
+        pk = self.kwargs.get('pk')
+        user = get_object_or_404(User, pk=pk)
+        if user.id == self.request.user.id:
+            return user
+        else:
+            messages.success(self.request, "You can edit only your profile!")
+            return None
 
-    def get_success_url(self):
-        profile_id = self.request.user.id
-        return reverse('profile', kwargs={'pk': profile_id})
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj is None:
+            pk = self.kwargs.get('pk')
+            return HttpResponseRedirect(reverse('profile', kwargs={'pk': pk}))
+        return super().dispatch(request, *args, **kwargs)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -409,7 +418,7 @@ class LoginUser(LoginView):
         status = self.request.GET.get('status')
         if status == 'activated':
             messages.success(self.request, "Complete the profile!")
-            return reverse_lazy('edit_profile')
+            return reverse_lazy('edit_profile', kwargs={'pk': self.request.user.id})
         messages.success(self.request, "You have logged in!")
         return reverse_lazy('feed')
 

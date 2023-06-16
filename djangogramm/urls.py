@@ -6,7 +6,7 @@ from base.settings.base import LOGIN_URL
 urlpatterns = [
     path('', views.FeedPage.as_view(), name='feed'),
     path(
-        'post/',
+        'posts/',
         include(
             [
                 path('<int:post_id>/', views.ShowPost.as_view(), name='single_post'),
@@ -14,6 +14,9 @@ urlpatterns = [
                 path('<int:post_id>/delete/', views.delete_post, name='delete_post'),
                 path('create/', views.CreatePost.as_view(), name='new_post'),
                 path('<int:post_id>/comment/', views.CommentView.as_view(), name='comment_post'),
+                path('<int:post_id>/like/', views.like_action, name='like'),
+                path('<int:post_id>/save/', views.save_action, name='save_post'),
+                path('<int:post_id>/remove_tag/<str:tag_title>/', views.remove_tag, name='remove_tag'),
             ]
         ),
     ),
@@ -30,7 +33,7 @@ urlpatterns = [
         ),
     ),
     path(
-        'comment/',
+        'comments/',
         include(
             [
                 path('<int:comment_id>/answer/', views.CommentView.as_view(), name='comment_comment'),
@@ -39,11 +42,12 @@ urlpatterns = [
         ),
     ),
     path(
-        'profile/',
+        'users/',
         include(
             [
-                path('details/<int:pk>/', views.ShowProfile.as_view(), name='profile'),
-                path('edit/', views.EditProfile.as_view(), name='edit_profile'),
+                path('<int:pk>/', views.ShowProfile.as_view(), name='profile'),
+                path('<int:pk>/edit/', views.EditProfile.as_view(), name='edit_profile'),
+                path('<int:pk>/follow/', views.follow_action, name='follow'),
             ]
         ),
     ),
@@ -51,21 +55,9 @@ urlpatterns = [
         'search/',
         include(
             [
-                path('profile/', views.SearchProfile.as_view(), name='profile_search'),
-                path('index/', views.search_recognizer, name='search_recognizer'),
+                path('user/', views.SearchProfile.as_view(), name='profile_search'),
+                path('index/', views.search_handler, name='search_handler'),
             ]
         ),
     ),
-    path(
-        'interaction/',
-        include(
-            [
-                path('<int:post_id>/like/', views.like_action, name='like'),
-                path('<int:post_id>/save/', views.save_action, name='save_post'),
-                path('<int:user_id>/follow/', views.follow_action, name='follow'),
-                path('<int:post_id>/remove_tag/<str:tag_title>/', views.remove_tag, name='remove_tag'),
-            ]
-        ),
-    ),
-
 ]
