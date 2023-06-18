@@ -1,7 +1,9 @@
 from djangogramm.models import *
 from base.settings.base import *
 import random
+from io import BytesIO
 
+from PIL import Image
 from faker import Faker
 
 FAKE_AVATARS_DIR = 'fake/fake_avatars/'
@@ -16,10 +18,17 @@ fake_tags = [fake.word().lower() for i in range(30)]
 image_choices_list = []
 
 
-def create_fake_user(avatar_filename=None):
-    if not avatar_filename:
-        return False
-    avatar_path = os.path.join(MEDIA_ROOT, FAKE_AVATARS_DIR, avatar_filename)
+def create_fake_user():
+    red = random.randint(0, 255)
+    green = random.randint(0, 255)
+    blue = random.randint(0, 255)
+    color = (red, green, blue)
+
+    image = Image.new("RGB", (200, 200), color)
+
+    buffer = BytesIO()
+    image.save(buffer, format='PNG')
+    buffer.seek(0)
 
     username = fake.user_name()
     email = f'{username}@gmail.com'
@@ -27,7 +36,7 @@ def create_fake_user(avatar_filename=None):
     full_name = fake.name()
     bio = fake.sentence(nb_words=random.randint(15, 30))
 
-    upload_result = cloudinary.uploader.upload(avatar_path,
+    upload_result = cloudinary.uploader.upload(buffer,
                                                transformation=[
                                                    {'width': 200, 'height': 200, 'crop': 'fill'}
                                                ])
@@ -53,15 +62,18 @@ def create_media(post_id):
     post = Post.objects.filter(pk=post_id).first()
     if not post:
         return False
-    filename = random.choice(POST_FILES_LIST)
-    if filename in image_choices_list:
-        while filename in image_choices_list:
-            filename = random.choice(POST_FILES_LIST)
-            if len(image_choices_list) >= len(POST_FILES_LIST):
-                image_choices_list.clear()
-    image_choices_list.append(filename)
-    file_path = os.path.join(MEDIA_ROOT, FAKE_POST_IMAGES_DIR, filename)
-    upload_result = cloudinary.uploader.upload(file_path,
+    red = random.randint(0, 255)
+    green = random.randint(0, 255)
+    blue = random.randint(0, 255)
+    color = (red, green, blue)
+
+    image = Image.new("RGB", (640, 700), color)
+
+    buffer = BytesIO()
+    image.save(buffer, format='PNG')
+    buffer.seek(0)
+
+    upload_result = cloudinary.uploader.upload(buffer,
                                                transformation=[
                                                    {
                                                        'height': 700,
