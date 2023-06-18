@@ -353,19 +353,20 @@ class EditProfile(UpdateView):
     template_name = 'edit_profile.html'
 
     def get_object(self, queryset=None):
-        pk = self.kwargs.get('pk')
-        user = get_object_or_404(User, pk=pk)
+        user = get_object_or_404(User, pk=self.kwargs.get('pk'))
         if user.id == self.request.user.id:
             return user
         else:
             messages.success(self.request, "You can edit only your profile!")
             return None
 
+    def get_success_url(self):
+        return reverse('profile', kwargs={'pk': self.kwargs.get('pk')})
+
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
         if obj is None:
-            pk = self.kwargs.get('pk')
-            return HttpResponseRedirect(reverse('profile', kwargs={'pk': pk}))
+            return HttpResponseRedirect(reverse('profile', kwargs={'pk': self.kwargs.get('pk')}))
         return super().dispatch(request, *args, **kwargs)
 
 

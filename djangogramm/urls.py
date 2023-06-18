@@ -60,4 +60,5 @@ urlpatterns = [
             ]
         ),
     ),
+    path('oauth/', include('social_django.urls', namespace='social')),
 ]

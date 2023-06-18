@@ -143,5 +143,7 @@ class LoginUserForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super(LoginUserForm, self).__init__(*args, **kwargs)
 
-        self.fields['username'].widget.attrs['class'] = 'form-control'
-        self.fields['password'].widget.attrs['class'] = 'form-control'
+        self.fields['username'].widget.attrs['class'] = 'form-control text-center'
+        self.fields['username'].widget.attrs['style'] = 'max-width: 300px; margin: 0 auto;'
+        self.fields['password'].widget.attrs['class'] = 'form-control text-center'
+        self.fields['password'].widget.attrs['style'] = 'max-width: 300px; margin: 0 auto;'

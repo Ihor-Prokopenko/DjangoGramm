@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 <div class="col-md-6 offset-md-3">
     <h1 class="text-center text-light">Register</h1>
@@ -24,7 +25,21 @@
           <button type="submit" class="btn btn-secondary">Register</button>
       </div>
     </form>
+<br/>
+<br/>
+<div>
 
+    <div class="text-center">
+        <a class="btn btn-outline-secondary" href="{% url 'social:begin' 'github' %}">
+        <img src="{% static 'img/github_icon.png' %}" width="40">   SignUp with Github</a> <br/>
+    </div>
+<br/>
+    <div class="text-center">
+        <a class="btn btn-outline-secondary" href="{% url 'social:begin' 'google-oauth2' %}">
+        <img src="{% static 'img/google_icon.png' %}" width="40">  SignUp with Google</a> <br/>
+    </div>
+
+</div>
 
 </div>
 
