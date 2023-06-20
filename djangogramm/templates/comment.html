@@ -1,7 +1,7 @@
 {% load static %}
 <div class="card card-body card-header">
     <div class="card-header">
-        <div class="d-flex d-flex flex-wrap">
+        <div class="d-flex flex-wrap">
             <a href="{% url 'profile' comment.author.id %}" class="nav-link">
                         {% if comment.author.avatar %}
                         <img src="{{ comment.author.avatar.url }}" width="25" class="rounded-circle">
@@ -25,7 +25,7 @@
                 </button>
             </div>
             <div>
-                {% if request.user.id == comment.author.id or request.user.id == comment.by_post.author.id %}
+                {% if request.user.id == comment.author.id or request.user.id == comment.by_post.author.id or request.user.is_staff %}
                 <a class="btn btn-outline-secondary btn-sm me-1" type="button" data-bs-toggle="collapse" data-bs-target="#comment{{ comment.id }}" aria-expanded="false" aria-controls="collapseWidthExample">
                  Delete
                 </a>
@@ -69,7 +69,7 @@
         <br>
         <div class="card card-body">
             <hr class="hr">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex flex-wrap">
                 <a href="{% url 'profile' com.author.id %}" class="nav-link">
                         {% if com.author.avatar %}
                         <img src="{{ com.author.avatar.url }}" width="20" class="rounded-circle">
@@ -77,13 +77,13 @@
                         <img src="{% static 'img/no_avatar.png' %}" width="20" class="rounded-circle">
                         {% endif %}
                     {{ com.author.username}}</a>
-                <p class="text-secondary">{{ com.date_created }}</p>
+                <p class="text-secondary ms-auto">{{ com.date_created }}</p>
             </div>
             <p class="ms-2">
                 {{ com.text }}
             </p>
-            <div class="d-flex justify-content-end">
-                {% if request.user.id == com.author.id or request.user.id == com.by_post.author.id %}
+            <div class="d-flex ms-auto">
+                {% if request.user.id == com.author.id or request.user.id == com.by_post.author.id or request.user.is_staff %}
                 <a class="btn btn-outline-secondary btn-sm me-1" type="button" data-bs-toggle="collapse" data-bs-target="#comment{{ com.id }}" aria-expanded="false" aria-controls="collapseWidthExample">
                  Delete
                 </a>

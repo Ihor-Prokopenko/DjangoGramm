@@ -199,7 +199,7 @@ def delete_comment(request, comment_id):
         return redirect('feed')
     comment = get_object_or_404(Comment, id=comment_id)
 
-    if request.user.id == comment.author.id or request.user.id == comment.by_post.author.id:
+    if request.user.id == comment.author.id or request.user.id == comment.by_post.author.id or request.user.is_staff:
         parent_post = comment.target_post if comment.target_post else comment.target_comment.target_post
         comment.delete()
 
