@@ -186,7 +186,7 @@
     <!--    <hr class="hr">-->
     <div class="container mb-3">
         {% for tag in post.tags.all %}
-        <div class="btn btn-sm btn-secondary" role="alert"
+        <div class="btn btn-sm btn-secondary mb-1" role="alert"
              style="display: inline-block;">
             <a href="{% url 'feed' %}?tag={{ tag|urlencode }}" class="nav-link">{{ tag }}
             </a>

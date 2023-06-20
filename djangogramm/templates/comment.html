@@ -1,7 +1,7 @@
 {% load static %}
 <div class="card card-body card-header">
     <div class="card-header">
-        <div class="d-flex justify-content-between">
+        <div class="d-flex d-flex flex-wrap">
             <a href="{% url 'profile' comment.author.id %}" class="nav-link">
                         {% if comment.author.avatar %}
                         <img src="{{ comment.author.avatar.url }}" width="25" class="rounded-circle">
@@ -9,7 +9,7 @@
                         <img src="{% static 'img/no_avatar.png' %}" width="25" class="rounded-circle">
                         {% endif %}
                 {{ comment.author.username }}</a>
-            <p class="text-secondary">{{ comment.date_created }}</p>
+            <p class="text-secondary ms-auto">{{ comment.date_created }}</p>
         </div>
     </div>
     <div class="card-body">
