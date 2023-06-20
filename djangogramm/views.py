@@ -151,7 +151,6 @@ def like_action(request, post_id):
                 'value': 'added',
                 'likes_num': post.likes.count()
             }
-            # return redirect('single_post', post_id)
             return JsonResponse(data, safe=False)
 
         post.likes.remove(request.user)
@@ -159,7 +158,6 @@ def like_action(request, post_id):
             'value': 'removed',
             'likes_num': post.likes.count()
         }
-        # return redirect('single_post', post_id)
         return JsonResponse(data, safe=False)
     return redirect('feed')
 
@@ -433,7 +431,6 @@ class CommentView(View):
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
             text = comment_form.cleaned_data.get('text')
-            print(text)
             author = request.user
 
             if post_id:

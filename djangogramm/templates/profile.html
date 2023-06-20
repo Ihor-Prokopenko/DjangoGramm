@@ -19,10 +19,13 @@
         </div>
         <div class="container overflow-hidden">
             <div class="">
-                <div class="d-flex justify-content-between">
-                    <a class="container nav-link">
+                <div class="d-flex flex-wrap mt-2">
+                    <div class="me-auto">
+                        <a class="container nav-link">
                         <h4 class="">{{ profile.username }}</h4>
-                    </a>
+                        </a>
+                    </div>
+                    <div class="ms-auto">
                         {% if request.user.id != profile.id %}
                         <form class="follow-form" id="follow{{ profile.id }}"
                               action="{% url 'follow' pk=profile.id %}"
@@ -40,6 +43,7 @@
                         {% else %}
                         <a class="nav-link" href="{% url 'edit_profile' pk=profile.id %}"><img src="{% static 'img/edit.png' %}" width="20"></a>
                         {% endif %}
+                    </div>
 
                 </div>
                 <hr class="hr">

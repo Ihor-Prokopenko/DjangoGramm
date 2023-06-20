@@ -23,8 +23,12 @@
     border-color: transparent !important;
 }
 
+.comment-card {
+    border-color: transparent !important;
+}
+
 .card-header {
-    border-color: #455361;
+    border-color: #3D4853 !important;
 }
 
 .accordion-body {

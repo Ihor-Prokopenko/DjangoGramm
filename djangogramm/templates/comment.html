@@ -1,5 +1,5 @@
 {% load static %}
-<div class="card card-body">
+<div class="card card-body card-header">
     <div class="card-header">
         <div class="d-flex justify-content-between">
             <a href="{% url 'profile' comment.author.id %}" class="nav-link">
@@ -68,10 +68,11 @@
         {% for com in comment.comments.all %}
         <br>
         <div class="card card-body">
+            <hr class="hr">
             <div class="d-flex justify-content-between">
                 <a href="{% url 'profile' com.author.id %}" class="nav-link">
-                        {% if comment.author.avatar %}
-                        <img src="{{ comment.author.avatar.url }}" width="20" class="rounded-circle">
+                        {% if com.author.avatar %}
+                        <img src="{{ com.author.avatar.url }}" width="20" class="rounded-circle">
                         {% else %}
                         <img src="{% static 'img/no_avatar.png' %}" width="20" class="rounded-circle">
                         {% endif %}
