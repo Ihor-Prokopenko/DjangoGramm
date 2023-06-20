@@ -19,7 +19,6 @@ def register_generator(dep=None):
     def wrapper(generator_func):
         generator_func.dep = dep
         generators.append(generator_func)
-        print(f'{generator_func} registered!')
         return generator_func
 
     return wrapper
