@@ -1,85 +1,20 @@
-# DB
-Choice is MySQL to try first time with it.
+# A social network similar to Instagram
 
+## User capabilities: 
 
-# 1. Create django project:
+- Register or login via Github or Google account
+- Edit profile (fullname, bio, avatar)
+- Create post with 1-3 photos, description and tags
+- Delete/Edit own post
+- Like post
+- Save post into favourites
+- Comment post
+- Reply to a comment
+- Follow to other user
 
-- Adjust settings
-- Define static/media dirs/urls
-- Set database connection
-- Create DjangoGramm app
-- Register app at settings.py
+## Third-party services:
 
-# 2. Create models
-
-## CustomUser:
-- username
-- email
-- password
-- full_name
-- bio
-- avatar
-
-## Post:
-- author = ForeignKey(CustomUser)
-- description
-- tags = ManyToManyField(Tag)
-
-## Media:
-- image
-- post = ForeignKey(Post)
-
-## Tag:
-- title
-
-## Like:
-- liker = ForeignKey(CustomUser, related_name='likes')
-- target = ForeignKey(Post, related_name='likes')
-
-## Comment:
-- author = ForeignKey(CustomUser)
-- text
-- target = ForeignKey(Post)
-
-## Follow:
-- follower = ForeignKey(CustomUser, related_name='followers')
-- target = ForeignKey(CustomUser, related_name='followers')
-
-# 3. Create Forms
-
-- Login
-- Register
-- EditProfile
-- CreatePost
-- Comment
-
-# 4. Create Routes and Views
-- Login/logout
-- Register/ConfirmEmail
-- Profile
-- Post/CreatePost
-- Feed
-
-*as needed routes*
-
-*in the process it will be clear which method will be for these functions*
-
-- Add/Remove
-
-  - Like
-  - Follow
-  - Comment
-  - Delete post
-
-# 5. Invent Preview functionality
-
-~
-
-# 6. Fill database with fake data, then test it work
-
-
-~
-
-# 7. Deploy project to the server
-
-~
+- Cloudinary to store photos
+- Github social auth
+- Google social auth
+- Google smtp for email verification
