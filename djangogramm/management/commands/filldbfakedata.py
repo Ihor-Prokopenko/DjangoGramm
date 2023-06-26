@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from djangogramm import fake_fill_db
+from . import fake_fill_db
 
 
 class Command(BaseCommand):
